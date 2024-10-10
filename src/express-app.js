@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { ErrorHandler, UserRouter } from "./api/index.js";
+import { BannerRouter, ErrorHandler, UserRouter } from "./api/index.js";
 
 const ExpressApp = async (app) => {
   app.use(express.json());
@@ -8,6 +8,8 @@ const ExpressApp = async (app) => {
   app.use(cors());
 
   UserRouter(app);
+
+  BannerRouter(app); //
 
   app.use(ErrorHandler);
 };
