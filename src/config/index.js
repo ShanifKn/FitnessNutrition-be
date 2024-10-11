@@ -6,4 +6,6 @@ const PORT = process.env.PORT;
 
 const DB_URL = process.env.MONGODB_URL;
 
-export { PORT, DB_URL };
+const JWT_SECRET = process.env.JWT_SECRET;
+
+export { PORT, DB_URL, JWT_SECRET };
