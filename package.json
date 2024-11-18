@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "monent": "^0.0.2-security",
     "mongoose": "^8.6.2",
+    "nodemailer": "^6.9.16",
     "path": "^0.12.7",
     "uuid": "^10.0.0",
     "winston": "^3.14.2",
@@ -36,5 +37,5 @@
   "devDependencies": {
     "nodemon": "^3.1.4"
   },
-   "type": "module"
+  "type": "module"
 }

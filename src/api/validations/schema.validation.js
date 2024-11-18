@@ -12,19 +12,23 @@ export const SchemaValidationForBanner = [
   check("visibility").notEmpty().withMessage("Visibility is mandatory").isBoolean().withMessage("Visibility must be a boolean"),
 
   // Category, check validity
-  check("category")
-    .notEmpty()
-    .withMessage("Category is mandatory")
-    .isArray()
-    .withMessage("Category must be an array of ObjectIds"),
+  check("category").notEmpty().withMessage("Category is mandatory").isArray().withMessage("Category must be an array of ObjectIds"),
 
   // SubCategory, check validity (if present)
-  check("subCategory")
-    .optional(),
+  check("subCategory").optional(),
 
   // Product (if present), check validity
   check("product").optional().isString().withMessage("Product must be a string"),
 
   // Image, check validity
   check("image").notEmpty().withMessage("Image URL is mandatory").isString().withMessage("Image URL must be a string"),
+];
+
+// login sechme validation //
+export const SchemaValidationForLogin = [
+  // email , check validity
+  check("email").trim().notEmpty().withMessage("Email Id is mandatory").isEmail().withMessage("Invalid email address"),
+
+  // password , check validity
+  check("password").notEmpty().withMessage("Password is mandatory").isLength({ min: 6 }).withMessage("Password must be at least 6 characters long"),
 ];

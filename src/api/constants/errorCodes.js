@@ -2,6 +2,8 @@ export const USER_ALREADY_EXISTS = 1001;
 
 export const USER_NOT_FOUND = 1002;
 
+export const INCORRECT_OTP = 1003;
+
 export const PASSWORD_MISSMATCHED = 1004;
 
 export const TOKEN_VERIFICATION_FAIL = 1007;
