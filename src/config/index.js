@@ -14,6 +14,8 @@ const EMAIL_USER_ID = process.env.EMAIL_USER_ID;
 
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 
+const BASE_URL = process.env.BASE_URL;
+
 const JWT_OPTIONS = {
   issuer: process.env.JWT_ISSUER,
   expiresIn: parseInt(process.env.JWT_EXPIRES),
@@ -21,4 +23,4 @@ const JWT_OPTIONS = {
   subject: process.env.JWT_SUBJECT,
 };
 
-export { PORT, DB_URL, JWT_SECRET, PRIVATE_KEY, EMAIL_PASSWORD, EMAIL_USER_ID, JWT_OPTIONS };
+export { BASE_URL, PORT, DB_URL, JWT_SECRET, PRIVATE_KEY, EMAIL_PASSWORD, EMAIL_USER_ID, JWT_OPTIONS };

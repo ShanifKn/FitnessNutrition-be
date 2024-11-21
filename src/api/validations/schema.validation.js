@@ -32,3 +32,26 @@ export const SchemaValidationForLogin = [
   // password , check validity
   check("password").notEmpty().withMessage("Password is mandatory").isLength({ min: 6 }).withMessage("Password must be at least 6 characters long"),
 ];
+
+export const SchemaValidationForCategory = [
+  // Title validation
+  check("title").trim().notEmpty().withMessage("Title is mandatory").isString().withMessage("Title must be a string"),
+
+  // Tag validation (optional field, but if provided, must be a string)
+  check("tag").optional().isString().withMessage("Tag must be a string"),
+
+  // Description validation
+  check("description").trim().notEmpty().withMessage("Description is mandatory").isString().withMessage("Description must be a string"),
+
+  // Visibility validation
+  check("visibility").notEmpty().withMessage("Visibility is mandatory").isBoolean().withMessage("Visibility must be a boolean"),
+
+  // Publish date validation
+  check("publishDate").notEmpty().withMessage("Publish date is mandatory").isISO8601().withMessage("Publish date must be a valid ISO 8601 date"),
+
+  // Maximum discount validation
+  check("maximumDiscount").notEmpty().withMessage("Maximum discount is mandatory").isNumeric().withMessage("Maximum discount must be a number"),
+
+  // Featured category validation
+  check("featuredCategory").notEmpty().withMessage("Featured category is mandatory").isBoolean().withMessage("Featured category must be a boolean"),
+];

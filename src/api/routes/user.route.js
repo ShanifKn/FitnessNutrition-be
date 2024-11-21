@@ -53,7 +53,6 @@ const UserRouter = (app) => {
 
       const { message } = await service.UserLogin({ email, password });
 
-      console.log(message);
 
       return res.status(200).json({ message });
     })
@@ -76,6 +75,22 @@ const UserRouter = (app) => {
       const { token, message } = await service.VerifyOtp({ email, otp });
 
       return res.status(200).json({ message, token });
+    })
+  );
+
+  app.post(
+    "/send-otp",
+    LoginRateLimiter,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { email, otp } = req.body;
+
+      //Check if user already exists with given email and role
+      await userExists.ForLogin({ email });
+
+      const { message } = await service.VerifyOtp({ email, otp });
+
+      return res.status(200).json({ message });
     })
   );
 };

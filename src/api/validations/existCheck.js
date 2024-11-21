@@ -13,7 +13,7 @@ class ExistCheck {
       email,
     });
 
-    if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No verified user found with provided details.", 404);
+    if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with provided email id.", 400);
   }
 
   async ForSignup({ email }) {

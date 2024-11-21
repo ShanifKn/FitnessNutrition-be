@@ -1,10 +1,12 @@
 import { INCORRECT_OTP } from "../api/constants/errorCodes.js";
 import UserHelper from "../api/helpers/user.helper.js";
 import AppError from "../utils/appError.js";
+import MailService from "./mail.service.js";
 
 class UserService {
   constructor() {
     this.userHelper = new UserHelper();
+    this.mailService = new MailService();
   }
 
   async UserLogin({ email, password }) {
@@ -32,6 +34,16 @@ class UserService {
     const token = await this.userHelper.GenerateSignedJwt(verified);
 
     return { token: token, message: "User login successful" };
+  }
+
+  async ResendOpt({ email, otp }) {
+    const { _id } = await this.userHelper.FindByEmail({ email });
+
+    const user = await this.userHelper.VerifyOtp({ _id, otp });
+
+    if (user) return this.mailService.SendOtpMail(email, user.otp);
+
+    return this.userHelper.SendOtpMail({ user });
   }
 }
 
