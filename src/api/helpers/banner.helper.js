@@ -56,6 +56,12 @@ class BannerHelper {
 
     return banners;
   }
+
+
+  async GetUserBanners() {
+    return await this.repositories.GetUserBanners();
+  }
+
 }
 
 export default BannerHelper;

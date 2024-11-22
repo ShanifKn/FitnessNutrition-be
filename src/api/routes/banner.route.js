@@ -11,7 +11,7 @@ const BannerRouter = (app) => {
 
   //@route Get /banners
   //@des  For getting the all banner
-  //@access Public
+  //@access Private
   app.get(
     "/banners",
     tryCatch(async (req, res) => {
@@ -20,6 +20,20 @@ const BannerRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+
+  //@route Get /banners
+  //@des  For getting the all banner
+  //@access Publick
+  app.get(
+    "/allBanners",
+    tryCatch(async (req, res) => {
+      const data = await service.GetUserBanners();
+
+      return res.status(200).json({ data });
+    })
+  );
+
 
   //@route POST /create-banner
   //@des  For create new banner and update banner

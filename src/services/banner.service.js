@@ -18,6 +18,13 @@ class BannerService {
   async DeleteBanner({ _id }) {
     return await this.bannerHelper.DeleteBanner({ _id });
   }
+
+
+  async GetUserBanners() {
+    const data = await this.bannerHelper.GetUserBanners();
+
+    return await this.bannerHelper.SeparatedBanners(data);
+  }
 }
 
 export default BannerService;

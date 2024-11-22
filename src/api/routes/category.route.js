@@ -61,7 +61,6 @@ const CategoryRouter = (app) => {
   //@access private
   app.get(
     "/category",
-    Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const data = await service.GetAllTheCategory();
@@ -91,7 +90,6 @@ const CategoryRouter = (app) => {
   //@access private
   app.get(
     "/non-category",
-    Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const data = await service.GetNonFeaturedCategory();
@@ -102,10 +100,9 @@ const CategoryRouter = (app) => {
 
   // @route GET /
   //@desc get  Featured category all
-  //@access private
+  //@access public
   app.get(
     "/featured-category",
-    Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const data = await service.GetAllFeaturedCategory();
