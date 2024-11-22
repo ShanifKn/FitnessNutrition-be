@@ -14,6 +14,10 @@ class BannerRepository {
   async DeleteBanner({ _id }) {
     return await BannerModel.findByIdAndDelete({ _id });
   }
+
+  async GetUserBanners() {
+    return await BannerModel.find({ visibility: true });
+  }
 }
 
 export default BannerRepository;
