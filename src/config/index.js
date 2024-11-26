@@ -16,6 +16,10 @@ const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 
 const BASE_URL = process.env.BASE_URL;
 
+const ZOHO_GENERATE_TOKEN = process.env.ZOHO_TOKEN_URL;
+
+const ZOHO_PRODUCT_URL = process.env.ZOHO_PRODUCT_URL;
+
 const JWT_OPTIONS = {
   issuer: process.env.JWT_ISSUER,
   expiresIn: parseInt(process.env.JWT_EXPIRES),
@@ -23,4 +27,4 @@ const JWT_OPTIONS = {
   subject: process.env.JWT_SUBJECT,
 };
 
-export { BASE_URL, PORT, DB_URL, JWT_SECRET, PRIVATE_KEY, EMAIL_PASSWORD, EMAIL_USER_ID, JWT_OPTIONS };
+export { BASE_URL, PORT, DB_URL, JWT_SECRET, PRIVATE_KEY, ZOHO_PRODUCT_URL, EMAIL_PASSWORD, EMAIL_USER_ID, JWT_OPTIONS, ZOHO_GENERATE_TOKEN };

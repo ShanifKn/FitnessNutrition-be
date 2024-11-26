@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import { EMAIL_PASSWORD, EMAIL_USER_ID } from "../config/index.js";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
+  host: "mail.fitnmuscles.com",
   port: 587,
   auth: {
     user: EMAIL_USER_ID,
