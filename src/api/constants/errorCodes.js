@@ -16,6 +16,8 @@ export const UNAUTHORIZED_USER = 1010;
 
 export const COMMENT_NOT_FOUND = 2001;
 
+export const ZOHO_API_ERROR = 2002;
+
 export const COMMON_STATUS = {
   PENDING: "PENDING",
   ACTIVE: "ACTIVE",

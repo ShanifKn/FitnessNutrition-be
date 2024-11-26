@@ -12,9 +12,11 @@ class UserService {
   async UserLogin({ email, password }) {
     const user = await this.userHelper.ValidateUserLogin({ email, password });
 
-    if (user) this.userHelper.SendOtpMail({ user });
+    if (!user) return { message: "Invalid user" };
 
-    return { message: "Otp send successfully" };
+    const { otp } = await this.userHelper.SendOtpMail({ user });
+
+    return { message: `Otp send successfully OTP:${otp}` };
   }
 
   async CreateUser({ email, password }) {
