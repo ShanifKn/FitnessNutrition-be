@@ -3,8 +3,7 @@ import { SubCategory } from "../models/subCategory.model.js";
 
 class CategoryRepository {
   async CreateCategory({ image, _id, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory, subCategory }) {
-    console.log(_id);
-
+    
     return await MainCategory.findByIdAndUpdate({ _id }, { image, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory, subCategory }, { upsert: true, new: true });
   }
 
