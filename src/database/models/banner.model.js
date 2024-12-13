@@ -8,7 +8,7 @@ const bannerSchema = new mongoose.Schema(
 
     visibility: { type: Boolean, required: true },
 
-    category: [{ type: Schema.Types.ObjectId, required: true }],
+    category: [{ type: Schema.Types.ObjectId }],
 
     subCategory: [{ type: Schema.Types.ObjectId }],
 
