@@ -12,7 +12,7 @@ export const SchemaValidationForBanner = [
   check("visibility").notEmpty().withMessage("Visibility is mandatory").isBoolean().withMessage("Visibility must be a boolean"),
 
   // Category, check validity
-  check("category").notEmpty().withMessage("Category is mandatory").isArray().withMessage("Category must be an array of ObjectIds"),
+  check("category").optional(),
 
   // SubCategory, check validity (if present)
   check("subCategory").optional(),
