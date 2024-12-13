@@ -27,6 +27,11 @@ const categoryLevel1 = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now },
       updatedAt: { type: Date, default: Date.now },
       level: { type: Number, default: 1 },
+      featuredCategory: { type: Boolean, default: false },
+      image: { type: String },
+      description: { type: String },
+      tag: { type: String },
+
       subCategory: [
         {
           title: { type: String, default: null }, // Allows null values

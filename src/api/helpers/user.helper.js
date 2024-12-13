@@ -33,16 +33,17 @@ class UserHelper {
     const code = await this.respository.OtpExist(user._id);
 
     if (code) {
-      await this.mailService.SendOtpMail(user.email, code.otp);
+      // await this.mailService.SendOtpMail(user.email, code.otp);
+
 
       return code.otp;
     }
 
     const generatedCode = await this.CreateOtpCode(user._id);
 
-    await this.mailService.SendOtpMail(user.email, generatedCode.otp);
+    // await this.mailService.SendOtpMail(user.email, generatedCode.otp);
 
-    return code.otp;
+    return generatedCode.otp;
   }
 
   async CreateOtpCode({ _id }) {

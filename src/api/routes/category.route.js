@@ -1,6 +1,7 @@
 import { BASE_URL } from "../../config/index.js";
 import CategoryService from "../../services/category.service.js";
-import uploadSingleImage from "../../services/image.service.js";
+import { convertToWebP, uploadSingleImage } from "../../services/image.service.js";
+
 import { tryCatch } from "../../utils/index.js";
 import Authentication from "../middlewares/authentication.js";
 import { SchemaValidationForCategory } from "../validations/schema.validation.js";
@@ -30,6 +31,7 @@ const CategoryRouter = (app) => {
   app.post(
     "/image-upload",
     uploadSingleImage,
+    convertToWebP,
     Validate,
     tryCatch(async (req, res) => {
       const image = req.file ? req.file.filename : null;
@@ -122,6 +124,22 @@ const CategoryRouter = (app) => {
       const _id = req.params.id;
 
       const { message } = await service.DeleteCategory({ _id });
+
+      return res.status(200).json({ message });
+    })
+  );
+
+  // @route PATCH /
+  //@desc update sub category
+  //@access private
+  app.patch(
+    "/create-category",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { parentId, _id, title, tag, description, featuredCategory, image } = req.body;
+
+      const { message } = await service.UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image });
 
       return res.status(200).json({ message });
     })

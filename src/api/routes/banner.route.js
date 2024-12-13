@@ -21,7 +21,6 @@ const BannerRouter = (app) => {
     })
   );
 
-
   //@route Get /banners
   //@des  For getting the all banner
   //@access Publick
@@ -34,7 +33,6 @@ const BannerRouter = (app) => {
     })
   );
 
-
   //@route POST /create-banner
   //@des  For create new banner and update banner
   //@access Private
@@ -45,6 +43,7 @@ const BannerRouter = (app) => {
     Validate,
     tryCatch(async (req, res) => {
       const { _id, title, bannerType, visibility, category, subCategory, product, image, expDate } = req.body;
+
 
       const { message } = await service.CreateBanner({ _id, title, bannerType, visibility, category, subCategory, product, image, expDate });
 

@@ -18,7 +18,7 @@ export const SchemaValidationForBanner = [
   check("subCategory").optional(),
 
   // Product (if present), check validity
-  check("product").optional().isString().withMessage("Product must be a string"),
+  check("product").optional(),
 
   // Image, check validity
   check("image").notEmpty().withMessage("Image URL is mandatory").isString().withMessage("Image URL must be a string"),

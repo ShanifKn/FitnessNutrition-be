@@ -8,7 +8,7 @@ class BannerRepository {
   }
 
   async CreateBanner({ _id, title, bannerType, visibility, category, subCategory, product, image, expDate }) {
-    return await BannerModel.findOneAndUpdate({ _id }, { title, bannerType, visibility, category, subCategory, product, image, expDate }, { upsert: true });
+    return await BannerModel.findOneAndUpdate({ _id }, { title, bannerType, visibility, category, subCategory, product, image, expDate }, { upsert: true, new: true });
   }
 
   async DeleteBanner({ _id }) {

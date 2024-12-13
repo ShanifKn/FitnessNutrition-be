@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { BannerRouter, CategoryRouter, ErrorHandler, UserRouter, ZohoRouter } from "./api/index.js";
+import { BannerRouter, CategoryRouter, ErrorHandler, ProductRouter, UserRouter, ZohoRouter } from "./api/index.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -24,6 +24,8 @@ const ExpressApp = async (app) => {
   CategoryRouter(app); //
 
   ZohoRouter(app); //
+
+  ProductRouter(app); //
 
   app.use(ErrorHandler);
 };

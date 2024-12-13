@@ -5,6 +5,7 @@ import { ZOHO_API_ERROR } from "../constants/errorCodes.js";
 import { ZOHO_GENERATE_TOKEN, ZOHO_PRODUCT_URL } from "../../config/index.js";
 import { Product } from "../../database/models/product.model.js";
 import ProductRepository from "../../database/repositories/product.repositories.js";
+import { ObjectId } from "mongodb";
 
 class ZohoHelper {
   constructor() {
@@ -50,15 +51,13 @@ class ZohoHelper {
         method: "POST", // POST method
       });
 
-      console.log(response);
-
       if (!response.ok) {
         throw new AppError(ZOHO_API_ERROR, "Zoho API Error", response.status);
       }
 
       const data = await response.json();
 
-      const { access_token, refresh_token, scope, api_domain, token_type, expires_in } = data;
+      const { access_token, scope, api_domain, token_type, expires_in } = data;
 
       await this.repository.UpdateZohoScret({ client_id, client_secret, access_token, refresh_token, scope, api_domain, token_type, expires_in });
 
@@ -101,7 +100,7 @@ class ZohoHelper {
   }
 
   async SaveProduct(items) {
-    const updatePromises = items.items.map(async (item) => {
+    const updatePromises = items.items.map(async (item, index) => {
       const {
         item_id,
         name,
@@ -153,9 +152,11 @@ class ZohoHelper {
         available_flavor,
       } = item;
 
+      const _id = new ObjectId();
+
       // Return the promise of updating the product
-      return this.productRespository.UpdataProduct({
-        _id: item._id,
+      return await this.productRespository.UpdataProduct({
+        _id,
         item_id,
         name,
         item_name,

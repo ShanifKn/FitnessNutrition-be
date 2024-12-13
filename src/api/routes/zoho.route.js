@@ -22,7 +22,7 @@ const ZohoRouter = (app) => {
   );
 
   app.get(
-    "/get-products",
+    "/get-ZohoProducts",
     Validate,
     tryCatch(async (req, res) => {
       const data = await service.GetProducts();

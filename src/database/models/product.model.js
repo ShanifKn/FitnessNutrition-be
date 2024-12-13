@@ -6,7 +6,7 @@ const ItemSchema = new mongoose.Schema(
     name: { type: String, required: true },
     item_name: { type: String },
     unit: { type: String },
-    status: { type: String, enum: ["active", "inactive"] },
+    status: { type: String },
     source: { type: String },
     is_linked_with_zohocrm: { type: Boolean },
     zcrm_product_id: { type: String },
@@ -32,7 +32,6 @@ const ItemSchema = new mongoose.Schema(
     actual_available_stock: { type: Number, default: 0 },
     sku: { type: String },
     reorder_level: { type: String },
-
     created_time: { type: Date, required: true },
     last_modified_time: { type: Date, required: true },
     cf_movemet_measure: { type: String },
@@ -46,17 +45,33 @@ const ItemSchema = new mongoose.Schema(
     cf_usage_unit: { type: String },
     cf_usage_unit_unformatted: { type: String },
 
-    category: { type: String },
+    parentCategory: { type: Schema.Types.ObjectId },
 
-    subCategory: { type: String },
+    subCategory: { type: Schema.Types.ObjectId },
 
-    image: [{ type: String }],
+    category: { type: Schema.Types.ObjectId },
+
+    images: [{ type: String, default: [null, null, null, null] }],
+
+    chips: [{ type: String }],
 
     additionalDescription: { type: String },
 
-    available_size: { type: String },
+    additionals: [{ key: { type: String }, value: { type: String } }],
 
-    available_flavor: { type: String },
+    variants: [{ variant: { type: String }, size: { type: String }, availableStock: { type: Number } }],
+
+    analytics: [{ type: String }],
+
+    paymentMethods: [{ type: String }],
+
+    publishDate: { type: Date },
+
+    maxDiscount: { type: Number },
+
+    pending: { type: Boolean, default: true },
+
+    rating: { type: Number },
   },
   { timestamps: true }
 );

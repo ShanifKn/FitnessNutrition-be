@@ -12,7 +12,6 @@ const StartServer = async () => {
 
   await ExpressApp(app);
 
-
   app
     .listen(PORT, () => {
       logger.info(`listening to port ${PORT}`);
