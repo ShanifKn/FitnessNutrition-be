@@ -1,0 +1,217 @@
+import ZohoRepository from "../../database/repositories/zoho.repositories.js";
+import fetch from "node-fetch";
+import AppError from "../../utils/appError.js";
+import { ZOHO_API_ERROR } from "../constants/errorCodes.js";
+import { ZOHO_GENERATE_TOKEN, ZOHO_PRODUCT_URL } from "../../config/index.js";
+import { Product } from "../../database/models/product.model.js";
+import ProductRepository from "../../database/repositories/product.repositories.js";
+import { ObjectId } from "mongodb";
+
+class ZohoHelper {
+  constructor() {
+    this.repository = new ZohoRepository();
+    this.productRespository = new ProductRepository();
+  }
+
+  async GenerateCode(client_id, client_secret, code) {
+    const redirect_uri = "http://www.zoho.com/books";
+
+    // Construct the full URL with query parameters
+    const url = `${ZOHO_GENERATE_TOKEN}?code=${encodeURIComponent(code)}&client_id=${encodeURIComponent(client_id)}&client_secret=${encodeURIComponent(client_secret)}&redirect_uri=${encodeURIComponent(redirect_uri)}&grant_type=authorization_code`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST", // POST method
+      });
+
+      if (!response.ok) {
+        throw new AppError(ZOHO_API_ERROR, "Zoho API Error", response.status);
+      }
+
+      const data = await response.json();
+
+      if (data.error === "invalid_code") {
+        throw new AppError(ZOHO_API_ERROR, "Invalid generate code", 400);
+      }
+
+      return data;
+    } catch (error) {
+      // console.error("Error:", error);
+      throw new AppError(ZOHO_API_ERROR, error.message, 400);
+    }
+  }
+
+  async ReGenerateCode({ client_id, client_secret, refresh_token }) {
+    const redirect_uri = "http://www.zoho.com/books";
+
+    const url = `${ZOHO_GENERATE_TOKEN}?refresh_token=${encodeURIComponent(refresh_token)}&client_id=${encodeURIComponent(client_id)}&client_secret=${encodeURIComponent(client_secret)}&redirect_uri=${encodeURIComponent(redirect_uri)}&grant_type=refresh_token`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST", // POST method
+      });
+
+      if (!response.ok) {
+        throw new AppError(ZOHO_API_ERROR, "Zoho API Error", response.status);
+      }
+
+      const data = await response.json();
+
+      const { access_token, scope, api_domain, token_type, expires_in } = data;
+
+      await this.repository.UpdateZohoScret({ client_id, client_secret, access_token, refresh_token, scope, api_domain, token_type, expires_in });
+
+      return data;
+    } catch (error) {
+      // console.error("Error:", error);
+      throw new AppError(ZOHO_API_ERROR, error.message, 400);
+    }
+  }
+
+  async CreateZohoScret({ client_id, client_secret, access_token, refresh_token, scope, api_domain, token_type, expires_in }) {
+    return await this.repository.CreateZohoScret({ client_id, client_secret, access_token, refresh_token, scope, api_domain, token_type, expires_in });
+  }
+
+  async GetToken({ scope }) {
+    return await this.repository.GetTokens({ scope });
+  }
+
+  async GetZohoApi(url, access_token) {
+    try {
+      const response = await fetch(url, {
+        method: "GET", // POST method
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Zoho-oauthtoken ${access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new AppError(ZOHO_API_ERROR, "Zoho API Error", response.status);
+      }
+
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      // console.error("Error:", error);
+      throw new AppError(ZOHO_API_ERROR, error.message, 400);
+    }
+  }
+
+  async SaveProduct(items) {
+    const updatePromises = items.items.map(async (item, index) => {
+      const {
+        item_id,
+        name,
+        item_name,
+        unit,
+        status,
+        source,
+        is_linked_with_zohocrm,
+        zcrm_product_id,
+        description,
+        rate,
+        tax_id,
+        tax_name,
+        tax_percentage,
+        purchase_account_id,
+        purchase_account_name,
+        account_id,
+        account_name,
+        purchase_description,
+        purchase_rate,
+        item_type,
+        product_type,
+        is_taxable,
+        tax_exemption_id,
+        tax_exemption_code,
+        stock_on_hand,
+        has_attachment,
+        available_stock,
+        actual_available_stock,
+        sku,
+        reorder_level,
+        created_time,
+        last_modified_time,
+        cf_movemet_measure,
+        cf_movemet_measure_unformatted,
+        cf_storage_condition,
+        cf_storage_condition_unformatted,
+        cf_classification,
+        cf_classification_unformatted,
+        cf_component_type,
+        cf_component_type_unformatted,
+        cf_usage_unit,
+        cf_usage_unit_unformatted,
+        category,
+        subCategory,
+        image,
+        additionalDescription,
+        available_size,
+        available_flavor,
+      } = item;
+
+      const _id = new ObjectId();
+
+      // Return the promise of updating the product
+      return await this.productRespository.UpdataProduct({
+        _id,
+        item_id,
+        name,
+        item_name,
+        unit,
+        status,
+        source,
+        is_linked_with_zohocrm,
+        zcrm_product_id,
+        description,
+        rate,
+        tax_id,
+        tax_name,
+        tax_percentage,
+        purchase_account_id,
+        purchase_account_name,
+        account_id,
+        account_name,
+        purchase_description,
+        purchase_rate,
+        item_type,
+        product_type,
+        is_taxable,
+        tax_exemption_id,
+        tax_exemption_code,
+        stock_on_hand,
+        has_attachment,
+        available_stock,
+        actual_available_stock,
+        sku,
+        reorder_level,
+        created_time,
+        last_modified_time,
+        cf_movemet_measure,
+        cf_movemet_measure_unformatted,
+        cf_storage_condition,
+        cf_storage_condition_unformatted,
+        cf_classification,
+        cf_classification_unformatted,
+        cf_component_type,
+        cf_component_type_unformatted,
+        cf_usage_unit,
+        cf_usage_unit_unformatted,
+        category,
+        subCategory,
+        image,
+        additionalDescription,
+        available_size,
+        available_flavor,
+      });
+    });
+
+    await Promise.all(updatePromises);
+
+    return "All products processed successfully.";
+  }
+}
+
+export default ZohoHelper;
