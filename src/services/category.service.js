@@ -32,6 +32,10 @@ class CategoryService {
   async DeleteCategory({ _id }) {
     return await this.categoryhelper.DeleteCategory({ _id });
   }
+
+  async UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image }) {
+    return await this.categoryhelper.UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image });
+  }
 }
 
 export default CategoryService;

@@ -53,7 +53,6 @@ const UserRouter = (app) => {
 
       const { message } = await service.UserLogin({ email, password });
 
-
       return res.status(200).json({ message });
     })
   );

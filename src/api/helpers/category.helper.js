@@ -43,6 +43,12 @@ class CategoryHelper {
 
     return { message: "Category deleted successfully" };
   }
+
+  async UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image }) {
+    await this.categoryRepository.UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image });
+
+    return { message: "Category update successfully" };
+  }
 }
 
 export default CategoryHelper;

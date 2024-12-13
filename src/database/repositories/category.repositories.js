@@ -3,6 +3,8 @@ import { SubCategory } from "../models/subCategory.model.js";
 
 class CategoryRepository {
   async CreateCategory({ image, _id, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory, subCategory }) {
+    console.log(_id);
+
     return await MainCategory.findByIdAndUpdate({ _id }, { image, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory, subCategory }, { upsert: true, new: true });
   }
 
@@ -28,6 +30,21 @@ class CategoryRepository {
 
   async DeleteCategory({ _id }) {
     return await MainCategory.deleteOne({ _id: _id });
+  }
+
+  async UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image }) {
+    return await MainCategory.findOneAndUpdate(
+      { _id: parentId, "subCategory._id": _id },
+      {
+        $set: {
+          "subCategory.$.title": title,
+          "subCategory.$.description": description,
+          "subCategory.$.tag": tag,
+          "subCategory.$.featuredCategory": featuredCategory,
+          "subCategory.$.image": image,
+        },
+      }
+    );
   }
 }
 

@@ -29,12 +29,13 @@ class ZohoService {
 
     const data = await this.helper.GetZohoApi(productUrl, access_token);
 
-    console.log(data);
+    // console.log(data);
 
     if (data) return await this.helper.SaveProduct(data);
 
     return data;
   }
+
 }
 
 export default ZohoService;

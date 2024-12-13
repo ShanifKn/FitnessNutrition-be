@@ -14,7 +14,7 @@ class UserService {
 
     if (!user) return { message: "Invalid user" };
 
-    const { otp } = await this.userHelper.SendOtpMail({ user });
+    const otp = await this.userHelper.SendOtpMail({ user });
 
     return { message: `Otp send successfully OTP:${otp}` };
   }
