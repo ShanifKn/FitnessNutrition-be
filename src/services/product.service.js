@@ -152,6 +152,10 @@ class ProductService {
 
     return { message: "Product has been updated and active" };
   }
+
+  async GetProductToType() {
+    return await this.helper.GetProductToType();
+  }
 }
 
 export default ProductService;

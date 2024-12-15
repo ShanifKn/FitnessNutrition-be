@@ -50,7 +50,7 @@ export const SchemaValidationForCategory = [
   check("publishDate").notEmpty().withMessage("Publish date is mandatory").isISO8601().withMessage("Publish date must be a valid ISO 8601 date"),
 
   // Maximum discount validation
-  check("maximumDiscount").notEmpty().withMessage("Maximum discount is mandatory").isNumeric().withMessage("Maximum discount must be a number"),
+  check("maximumDiscount").optional(),
 
   // Featured category validation
   check("featuredCategory").notEmpty().withMessage("Featured category is mandatory").isBoolean().withMessage("Featured category must be a boolean"),

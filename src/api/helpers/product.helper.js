@@ -280,6 +280,25 @@ class ProductHelper {
     // Pass the filtered data to the helper function
     return await this.repository.UpdateProducts(_id, filteredProductData);
   }
+
+  async GetProductToType() {
+    const product = await this.repository.GetProductAll();
+
+    // console.log(product);
+
+    const groupedProducts = product.reduce((result, product) => {
+      // Assuming `analytics` is an array of strings
+      product.analytics.forEach((analytic) => {
+        if (!result[analytic]) {
+          result[analytic] = [];
+        }
+        result[analytic].push(product);
+      });
+      return result;
+    }, {});
+
+    return groupedProducts;
+  }
 }
 
 export default ProductHelper;

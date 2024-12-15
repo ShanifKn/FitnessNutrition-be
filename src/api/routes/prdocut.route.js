@@ -202,6 +202,19 @@ const ProductRouter = (app) => {
       return res.status(200).json({ message });
     })
   );
+
+  // @route GET /
+  // @des get product by category
+  // @access private
+  app.get(
+    "/product-homepage",
+    Validate,
+    tryCatch(async (req, res) => {
+      const { NY, RM } = await service.GetProductToType();
+
+      return res.status(200).json({ NY, RM });
+    })
+  );
 };
 
 export default ProductRouter;

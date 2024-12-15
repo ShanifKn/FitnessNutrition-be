@@ -145,7 +145,12 @@ class ProductRepository {
   }
 
   async GetProducts() {
-    return await Product.find({ pending: false }).select("_id item_id actual_available_stock name rate status images").populate("category", "name");
+    return await Product.find({ pending: false }).populate("category", "name");
+  }
+
+
+  async GetProductAll() {
+    return await Product.find({ pending: false }).populate("category", "name");
   }
 
   async GetPendingCounts() {
