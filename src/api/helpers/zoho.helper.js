@@ -2,7 +2,7 @@ import ZohoRepository from "../../database/repositories/zoho.repositories.js";
 import fetch from "node-fetch";
 import AppError from "../../utils/appError.js";
 import { ZOHO_API_ERROR } from "../constants/errorCodes.js";
-import { ZOHO_GENERATE_TOKEN, ZOHO_PRODUCT_URL } from "../../config/index.js";
+import { PAGE_LENGTH, ZOHO_GENERATE_TOKEN, ZOHO_PRODUCT_URL } from "../../config/index.js";
 import { Product } from "../../database/models/product.model.js";
 import ProductRepository from "../../database/repositories/product.repositories.js";
 import { ObjectId } from "mongodb";
@@ -76,31 +76,50 @@ class ZohoHelper {
     return await this.repository.GetTokens({ scope });
   }
 
-  async GetZohoApi(url, access_token) {
+  async GetZohoApi(baseUrl, access_token, organizationID) {
+
+    const pageList = Array.from({ length: PAGE_LENGTH }, (_, index) => index + 1);
+
+    const perPage = 200;
+
+    const allProducts = [];
+
     try {
-      const response = await fetch(url, {
-        method: "GET", // POST method
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Zoho-oauthtoken ${access_token}`,
-        },
+      const requests = pageList.map((page) => {
+        const url = `${baseUrl}?page=${page}&per_page=${perPage}&organization_id=${organizationID}`;
+
+        return fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Zoho-oauthtoken ${access_token}`,
+          },
+        }).then((response) => {
+          if (!response.ok) {
+            throw new AppError(ZOHO_API_ERROR, `Zoho API Error: Page ${page}`, response.status);
+          }
+          return response.json();
+        });
       });
 
-      if (!response.ok) {
-        throw new AppError(ZOHO_API_ERROR, "Zoho API Error", response.status);
-      }
+      const responses = await Promise.all(requests);
 
-      const data = await response.json();
+      responses.forEach((data, index) => {
+        if (data && data.items) {
+          allProducts.push(...data.items);
+        } else {
+          console.warn(`No products found on page ${pageList[index]}`);
+        }
+      });
 
-      return data;
+      return allProducts;
     } catch (error) {
-      // console.error("Error:", error);
       throw new AppError(ZOHO_API_ERROR, error.message, 400);
     }
   }
 
   async SaveProduct(items) {
-    const updatePromises = items.items.map(async (item, index) => {
+    const updatePromises = items.map(async (item, index) => {
       const {
         item_id,
         name,

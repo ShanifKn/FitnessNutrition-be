@@ -83,7 +83,8 @@ class ProductService {
     publishDate,
     variants,
     additionals,
-    rating
+    rating,
+    dietary
   ) {
     await this.helper.UpdateProducts(
       _id,
@@ -147,7 +148,8 @@ class ProductService {
       publishDate,
       variants,
       additionals,
-      rating
+      rating,
+      dietary
     );
 
     return { message: "Product has been updated and active" };
@@ -155,6 +157,18 @@ class ProductService {
 
   async GetProductToType() {
     return await this.helper.GetProductToType();
+  }
+
+  async GetAllProduct() {
+    return await this.helper.GetAllProduct();
+  }
+
+  async CreateVaraintProduct({ item_id, products }) {
+    return await this.helper.CreateVaraintProduct({ item_id, products });
+  }
+
+  async getVariant(_id) {
+    return await this.helper.getVariant(_id);
   }
 }
 

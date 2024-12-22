@@ -132,7 +132,9 @@ const ProductRouter = (app) => {
         variants,
         additionals,
         rating,
+        dietary,
       } = req.body;
+
 
       const { message } = await service.UpdateProduct(
         _id,
@@ -196,7 +198,8 @@ const ProductRouter = (app) => {
         publishDate,
         variants,
         additionals,
-        rating
+        rating,
+        dietary
       );
 
       return res.status(200).json({ message });
@@ -213,6 +216,51 @@ const ProductRouter = (app) => {
       const { NY, RM } = await service.GetProductToType();
 
       return res.status(200).json({ NY, RM });
+    })
+  );
+
+  // @route GET /
+  // @des get product details
+  // @access private
+  app.get(
+    "/allProducts",
+    Validate,
+    tryCatch(async (req, res) => {
+      const data = await service.GetAllProduct();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route CREATE /
+  // @des add varaint products
+  // @access private
+  app.post(
+    "/createVaraint",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { item_id, products } = req.body;
+
+      const data = await service.CreateVaraintProduct({ item_id, products });
+
+      return res.status(200).json({ data, message: "Variant added" });
+    })
+  );
+
+  // @route GET /
+  // @des  get variant by product id
+  // @access private
+  app.get(
+    "/variants/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id } = req.params;
+
+      const data = await service.getVariant(_id);
+
+      return res.status(200).json({ data });
     })
   );
 };

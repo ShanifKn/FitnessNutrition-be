@@ -1,4 +1,5 @@
 import { Product } from "../models/product.model.js";
+import { ProductVariant } from "../models/variantProduct.model.js";
 
 class ProductRepository {
   async FindProductById({ item_id }) {
@@ -68,6 +69,8 @@ class ProductRepository {
     publishDate,
     variants,
     additionals,
+    rating,
+    dietary,
   }) {
     return await Product.updateOne(
       { item_id },
@@ -131,6 +134,8 @@ class ProductRepository {
         publishDate,
         variants,
         additionals,
+        rating,
+        dietary,
       },
       { upsert: true, new: true }
     );
@@ -144,10 +149,13 @@ class ProductRepository {
     return await Product.find({ pending: true, status: "active" }).select("_id item_id actual_available_stock name rate status image"); // Adjust the fields you want from the category
   }
 
+  async GetAllProduct() {
+    return await Product.find().select("_id item_id actual_available_stock name rate status image");
+  }
+
   async GetProducts() {
     return await Product.find({ pending: false }).populate("category", "name");
   }
-
 
   async GetProductAll() {
     return await Product.find({ pending: false }).populate("category", "name");
@@ -159,6 +167,16 @@ class ProductRepository {
 
   async GetProductDetails({ _id }) {
     return await Product.findOne({ _id }).populate("category", "name");
+  }
+
+  async CreateVaraintProduct({ item_id, products }) {
+    return await ProductVariant.updateOne({ item_id }, { products }, { upsert: true, new: true });
+  }
+
+  async getVariant(_id) {
+    return await ProductVariant.findOne({ item_id: _id })
+      .populate("products.product_id") // Populate the product_id field in the products array
+      .exec();
   }
 }
 

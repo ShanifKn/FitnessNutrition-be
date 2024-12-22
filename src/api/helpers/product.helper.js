@@ -81,7 +81,9 @@ class ProductHelper {
     paymentMethods,
     publishDate,
     variants,
-    additionals
+    additionals,
+    rating,
+    dietary
   ) {
     return await this.repository.UpdataProduct({
       item_id,
@@ -144,6 +146,8 @@ class ProductHelper {
       publishDate,
       variants,
       additionals,
+      rating,
+      dietary,
     });
   }
 
@@ -209,7 +213,8 @@ class ProductHelper {
     publishDate,
     variants,
     additionals,
-    rating
+    rating,
+    dietary
   ) {
     const productData = {
       item_id,
@@ -273,6 +278,7 @@ class ProductHelper {
       variants,
       additionals,
       rating,
+      dietary,
     };
 
     const filteredProductData = Object.fromEntries(Object.entries(productData).filter(([key, value]) => value !== undefined));
@@ -298,6 +304,18 @@ class ProductHelper {
     }, {});
 
     return groupedProducts;
+  }
+
+  async GetAllProduct() {
+    return this.repository.GetAllProduct();
+  }
+
+  async CreateVaraintProduct({ item_id, products }) {
+    return this.repository.CreateVaraintProduct({ item_id, products });
+  }
+
+  async getVariant(_id) {
+    return this.repository.getVariant(_id);
   }
 }
 

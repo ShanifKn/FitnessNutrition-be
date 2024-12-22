@@ -65,6 +65,8 @@ const ItemSchema = new mongoose.Schema(
 
     paymentMethods: [{ type: String }],
 
+    dietary: [{ type: String }],
+
     publishDate: { type: Date },
 
     maxDiscount: { type: Number },

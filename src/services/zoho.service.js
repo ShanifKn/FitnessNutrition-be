@@ -1,6 +1,6 @@
 import { ZOHO_API_ERROR } from "../api/constants/errorCodes.js";
 import ZohoHelper from "../api/helpers/zoho.helper.js";
-import { ZOHO_PRODUCT_URL } from "../config/index.js";
+import { ZOHO_ORGANIZATION, ZOHO_PRODUCT_URL } from "../config/index.js";
 import AppError from "../utils/appError.js";
 
 class ZohoService {
@@ -27,15 +27,15 @@ class ZohoService {
 
     const productUrl = ZOHO_PRODUCT_URL;
 
-    const data = await this.helper.GetZohoApi(productUrl, access_token);
+    const organizationID = ZOHO_ORGANIZATION;
 
+    const data = await this.helper.GetZohoApi(productUrl, access_token, organizationID);
     // console.log(data);
 
     if (data) return await this.helper.SaveProduct(data);
 
     return data;
   }
-
 }
 
 export default ZohoService;
