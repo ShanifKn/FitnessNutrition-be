@@ -1,10 +1,12 @@
 import ProductService from "../../services/product.service.js";
 import { tryCatch } from "../../utils/index.js";
 import Authentication from "../middlewares/authentication.js";
+import ExistCheck from "../validations/existCheck.js";
 import Validate from "../validations/validator.js";
 
 const ProductRouter = (app) => {
   const service = new ProductService();
+  const existCheck = new ExistCheck();
 
   // @route   GET /
   // @des     get all a pending products
@@ -133,8 +135,11 @@ const ProductRouter = (app) => {
         additionals,
         rating,
         dietary,
+        size,
+        colour,
+        flavour,
+        productBrand,
       } = req.body;
-
 
       const { message } = await service.UpdateProduct(
         _id,
@@ -199,7 +204,11 @@ const ProductRouter = (app) => {
         variants,
         additionals,
         rating,
-        dietary
+        dietary,
+        size,
+        colour,
+        flavour,
+        productBrand
       );
 
       return res.status(200).json({ message });
@@ -257,6 +266,8 @@ const ProductRouter = (app) => {
     Validate,
     tryCatch(async (req, res) => {
       const { _id } = req.params;
+
+      await existCheck.ForProduct(_id);
 
       const data = await service.getVariant(_id);
 

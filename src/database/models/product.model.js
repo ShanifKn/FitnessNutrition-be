@@ -74,6 +74,14 @@ const ItemSchema = new mongoose.Schema(
     pending: { type: Boolean, default: true },
 
     rating: { type: Number },
+
+    size: { type: String },
+
+    colour: { type: String },
+
+    flavour: { type: String },
+
+    productBrand: { type: String },
   },
   { timestamps: true }
 );

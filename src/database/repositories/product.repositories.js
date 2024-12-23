@@ -71,6 +71,10 @@ class ProductRepository {
     additionals,
     rating,
     dietary,
+    size,
+    colour,
+    flavour,
+    productBrand,
   }) {
     return await Product.updateOne(
       { item_id },
@@ -136,6 +140,10 @@ class ProductRepository {
         additionals,
         rating,
         dietary,
+        size,
+        colour,
+        flavour,
+        productBrand,
       },
       { upsert: true, new: true }
     );
@@ -150,7 +158,7 @@ class ProductRepository {
   }
 
   async GetAllProduct() {
-    return await Product.find().select("_id item_id actual_available_stock name rate status image");
+    return await Product.find().select("_id item_id actual_available_stock name rate status image size colour flavour ");
   }
 
   async GetProducts() {
@@ -177,6 +185,10 @@ class ProductRepository {
     return await ProductVariant.findOne({ item_id: _id })
       .populate("products.product_id") // Populate the product_id field in the products array
       .exec();
+  }
+
+  async CountUserByProduct(_id) {
+    return await ProductVariant.countDocuments({ item_id: _id });
   }
 }
 

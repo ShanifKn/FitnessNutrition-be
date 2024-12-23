@@ -1,3 +1,4 @@
+import ProductRepository from "../../database/repositories/product.repositories.js";
 import UserRepository from "../../database/repositories/user.repositories.js";
 import AppError from "../../utils/appError.js";
 import { USER_ALREADY_EXISTS, USER_NOT_FOUND } from "../constants/errorCodes.js";
@@ -5,6 +6,7 @@ import { USER_ALREADY_EXISTS, USER_NOT_FOUND } from "../constants/errorCodes.js"
 class ExistCheck {
   constructor() {
     this.userRep = new UserRepository();
+    this.productRep = new ProductRepository();
   }
 
   // check if user exists in case
@@ -22,6 +24,12 @@ class ExistCheck {
     });
 
     if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "User already exists with this Email ID. Please login", 400);
+  }
+
+  async ForProduct(_id) {
+    const productCount = await this.productRep.CountUserByProduct(_id);
+
+    if (productCount < 0) return null;
   }
 }
 

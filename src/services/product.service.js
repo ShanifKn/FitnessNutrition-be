@@ -84,7 +84,11 @@ class ProductService {
     variants,
     additionals,
     rating,
-    dietary
+    dietary,
+    size,
+    colour,
+    flavour,
+    productBrand
   ) {
     await this.helper.UpdateProducts(
       _id,
@@ -149,7 +153,11 @@ class ProductService {
       variants,
       additionals,
       rating,
-      dietary
+      dietary,
+      size,
+      colour,
+      flavour,
+      productBrand
     );
 
     return { message: "Product has been updated and active" };

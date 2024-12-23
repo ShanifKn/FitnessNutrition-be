@@ -214,7 +214,11 @@ class ProductHelper {
     variants,
     additionals,
     rating,
-    dietary
+    dietary,
+    size,
+    colour,
+    flavour,
+    productBrand
   ) {
     const productData = {
       item_id,
@@ -279,6 +283,10 @@ class ProductHelper {
       additionals,
       rating,
       dietary,
+      size,
+      colour,
+      flavour,
+      productBrand,
     };
 
     const filteredProductData = Object.fromEntries(Object.entries(productData).filter(([key, value]) => value !== undefined));
@@ -290,7 +298,6 @@ class ProductHelper {
   async GetProductToType() {
     const product = await this.repository.GetProductAll();
 
-    // console.log(product);
 
     const groupedProducts = product.reduce((result, product) => {
       // Assuming `analytics` is an array of strings
