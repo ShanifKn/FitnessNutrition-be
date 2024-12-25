@@ -247,7 +247,7 @@ class ProductHelper {
       item_name,
       item_type,
       last_modified_time,
-      pending: false,
+      pending: status === "inactive", // Set pending to true if status is inactive
       product_type,
       purchase_account_id,
       purchase_account_name,
@@ -288,6 +288,7 @@ class ProductHelper {
       flavour,
       productBrand,
     };
+    
 
     const filteredProductData = Object.fromEntries(Object.entries(productData).filter(([key, value]) => value !== undefined));
 
@@ -296,7 +297,7 @@ class ProductHelper {
   }
 
   async GetProductToType() {
-    const product = await this.repository.GetProductAll();
+    const product = await this.repository.GetProducts();
 
 
     const groupedProducts = product.reduce((result, product) => {

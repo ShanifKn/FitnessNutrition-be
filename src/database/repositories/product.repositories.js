@@ -154,7 +154,7 @@ class ProductRepository {
   }
 
   async GetPendingProducts() {
-    return await Product.find({ pending: true, status: "active" }).select("_id item_id actual_available_stock name rate status image"); // Adjust the fields you want from the category
+    return await Product.find({ pending: true }).select("_id item_id actual_available_stock name rate status image"); // Adjust the fields you want from the category
   }
 
   async GetAllProduct() {
@@ -165,9 +165,6 @@ class ProductRepository {
     return await Product.find({ pending: false }).populate("category", "name");
   }
 
-  async GetProductAll() {
-    return await Product.find({ pending: false }).populate("category", "name");
-  }
 
   async GetPendingCounts() {
     return await Product.countDocuments({ pending: true });

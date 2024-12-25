@@ -68,7 +68,7 @@ const ProductRouter = (app) => {
   // @access  Private
   app.post(
     "/updateProduct",
-    // Authentication,
+    Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const {
@@ -262,7 +262,6 @@ const ProductRouter = (app) => {
   // @access private
   app.get(
     "/variants/:_id",
-    Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const { _id } = req.params;
