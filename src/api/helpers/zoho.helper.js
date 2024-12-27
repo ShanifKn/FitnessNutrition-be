@@ -2,7 +2,7 @@ import ZohoRepository from "../../database/repositories/zoho.repositories.js";
 import fetch from "node-fetch";
 import AppError from "../../utils/appError.js";
 import { ZOHO_API_ERROR } from "../constants/errorCodes.js";
-import { PAGE_LENGTH, ZOHO_GENERATE_TOKEN, ZOHO_PRODUCT_URL } from "../../config/index.js";
+import { PAGE_LENGTH, ZOHO_GENERATE_TOKEN, ZOHO_ORGANIZATION, ZOHO_PRODUCT_URL } from "../../config/index.js";
 import { Product } from "../../database/models/product.model.js";
 import ProductRepository from "../../database/repositories/product.repositories.js";
 import { ObjectId } from "mongodb";
@@ -72,12 +72,11 @@ class ZohoHelper {
     return await this.repository.CreateZohoScret({ client_id, client_secret, access_token, refresh_token, scope, api_domain, token_type, expires_in });
   }
 
-  async GetToken({ scope }) {
-    return await this.repository.GetTokens({ scope });
+  async GetToken() {
+    return await this.repository.GetTokens();
   }
 
   async GetZohoApi(baseUrl, access_token, organizationID) {
-
     const pageList = Array.from({ length: PAGE_LENGTH }, (_, index) => index + 1);
 
     const perPage = 200;
@@ -230,6 +229,46 @@ class ZohoHelper {
     await Promise.all(updatePromises);
 
     return "All products processed successfully.";
+  }
+
+  async CreateCustomer({ email, name, phone, access_token }) {
+    const url = `https://www.zohoapis.com/books/v3/contacts?organization_id=${ZOHO_ORGANIZATION}`;
+
+    const payload = {
+      contact_name: name,
+      company_name: name, // Assuming the company name is the same as the contact name
+      contact_persons: [
+        {
+          email: email,
+          phone: phone,
+        },
+      ],
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Zoho-oauthtoken ${access_token}`, // Use your actual Zoho auth token
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        // console.log(response);
+
+        throw new AppError(ZOHO_API_ERROR, "1 ZOHO Api error", 400);
+      }
+
+      const data = await response.json();
+
+      return data;
+    } catch (e) {
+      // console.log(e);
+
+      throw new AppError(ZOHO_API_ERROR, "2 ZOHO Api error", 400);
+    }
   }
 }
 

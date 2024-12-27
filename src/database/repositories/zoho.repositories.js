@@ -11,8 +11,8 @@ class ZohoRepository {
     return await zohoToken.findOneAndReplace({ scope }, { client_id, client_secret, access_token, refresh_token, scope, api_domain, token_type, expires_in });
   }
 
-  async GetTokens({ scope }) {
-    return await zohoToken.findOne({ scope: scope });
+  async GetTokens() {
+    return await zohoToken.findOne();
   }
 }
 

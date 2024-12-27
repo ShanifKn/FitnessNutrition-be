@@ -36,6 +36,68 @@ const UserRouter = (app) => {
     })
   );
 
+  // @route POST /signup
+  app.post(
+    "/signup-firebase",
+    LoginRateLimiter,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id, email, name, password, image, phone, DOB, gender } = req.body;
+
+      const user = await userExists.ForCustomerSignup({ email });
+
+      let data;
+
+      if (!user) {
+        data = await service.CreateCustomer({ _id, email, name, password, image, phone, DOB, gender });
+      }
+
+      data = await service.CustomerSignup({ email });
+
+      return res.status(200).json({ data, message: "Successfully logged in!" });
+    })
+  );
+
+  // @route POST /signup
+  //@des signup with clinet-side
+  app.post(
+    "/customer-signup",
+    LoginRateLimiter,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { name, email, password, phone } = req.body;
+
+      //Check if user already exists with given email and role
+      if (email) await userExists.ForCustomer({ email });
+
+      if (phone) await userExists.ForCustomerPhone({ phone });
+
+      const { message } = await service.CustomerCreate({ name, email, password, phone });
+
+      return res.status(200).json({ message });
+    })
+  );
+
+  // @route   POST /otp-verify
+  // @desc    otp verification
+  // @access  Public
+  // @fields  email,otp
+  app.post(
+    "/customer-verify",
+    LoginRateLimiter,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { email, phone, otp } = req.body;
+
+      //Check if user already exists with given email and role
+      await userExists.ForCustomerVerfication({ email, phone });
+
+      const { token, message } = await service.CustomerVerfication({ email, phone });
+
+      return res.status(200).json({ message, token });
+    })
+  );
+
   // @route   POST /login
   // @desc    admin login
   // @access  Public

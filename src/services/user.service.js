@@ -23,7 +23,11 @@ class UserService {
     //convert password to hash
     password = await this.userHelper.CreateHash(password);
 
-    return await this.userHelper.createUser({ email, password });
+    const user = await this.userHelper.createUser({ email, password });
+
+    if (email) await this.userHelper.SendOtpMail({ user });
+
+    return { message: `Otp send successfully OTP` };
   }
 
   async VerifyOtp({ email, otp }) {
@@ -43,9 +47,54 @@ class UserService {
 
     const user = await this.userHelper.VerifyOtp({ _id, otp });
 
-    if (user) return this.mailService.SendOtpMail(email, user.otp);
+    if (user) return await this.mailService.sendOtpMail(email, user.otp);
 
-    return this.userHelper.SendOtpMail({ user });
+    return await this.userHelper.SendOtpMail({ user });
+  }
+
+  async CreateCustomer({ _id, email, name, password, image, phone, DOB, gender }) {
+    return await this.userHelper.CreateCustomer({ _id, email, name, password, image, phone, DOB, gender });
+  }
+
+  async CustomerSignup({ email }) {
+    return await this.userHelper.CustomerSignup({ email });
+  }
+
+  async CustomerCreate({ name, email, password, phone }) {
+    //convert password to hash
+    password = await this.userHelper.CreateHash(password);
+
+    const user = await this.userHelper.CustomerCreateDB({ name, email, password, phone });
+
+    // if (user && email) await this.userHelper.SendOtpMail({ user });
+
+    // if (user && phone) await this.userHelper.SendOtpPhone({ user });
+
+    await this.userHelper.CreateCustomerZoho(user);
+
+    return { message: `Otp send successfully OTP` };
+  }
+
+  async CustomerVerfication({ email, phone, otp }) {
+    let user = null;
+
+    if (email) {
+      user = await this.userHelper.FindCustomerBYEmail({ email });
+    }
+
+    if (phone) {
+      user = await this.userHelper.FindCustomerBYPhone({ phone });
+    }
+
+    const { _id } = user;
+
+    const verified = await this.userHelper.VerifyOtp({ _id, otp });
+
+    if (!verified) throw new AppError(INCORRECT_OTP, "Incorrect Otp Number.", 400);
+
+    const token = await this.userHelper.GenerateSignedJwt(verified);
+
+    return { token: token, message: "User login successful" };
   }
 }
 

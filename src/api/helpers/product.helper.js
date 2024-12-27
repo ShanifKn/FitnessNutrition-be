@@ -288,6 +288,7 @@ class ProductHelper {
       flavour,
       productBrand,
     };
+
     
 
     const filteredProductData = Object.fromEntries(Object.entries(productData).filter(([key, value]) => value !== undefined));

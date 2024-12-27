@@ -8,7 +8,6 @@ const ZohoRouter = (app) => {
   // @route   POST /
   // @des     access and generate token
   // @access  Public
-
   app.post(
     "/create-token",
     Validate,
@@ -30,6 +29,7 @@ const ZohoRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
 };
 
 export default ZohoRouter;

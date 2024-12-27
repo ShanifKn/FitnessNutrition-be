@@ -5,11 +5,15 @@ import { AppError } from "../../utils/index.js";
 import { PASSWORD_MISSMATCHED } from "../constants/errorCodes.js";
 import MailService from "../../services/mail.service.js";
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
+import ZohoHelper from "./zoho.helper.js";
+import ZohoService from "../../services/zoho.service.js";
 
 class UserHelper {
   constructor() {
     this.respository = new UserRepository();
     this.mailService = new MailService();
+    this.zohoService = new ZohoService();
   }
 
   async ValidateUserLogin({ email, password }) {
@@ -33,15 +37,30 @@ class UserHelper {
     const code = await this.respository.OtpExist(user._id);
 
     if (code) {
-      // await this.mailService.SendOtpMail(user.email, code.otp);
-
+      await this.mailService.sendOtpMail(user.email, code.otp);
 
       return code.otp;
     }
 
     const generatedCode = await this.CreateOtpCode(user._id);
 
-    // await this.mailService.SendOtpMail(user.email, generatedCode.otp);
+    await this.mailService.sendOtpMail(user.email, generatedCode.otp);
+
+    return generatedCode.otp;
+  }
+
+  async SendOtpPhone({ user }) {
+    const code = await this.respository.OtpExist(user._id);
+
+    if (code) {
+      await this.mailService.sendOtpSms(user.phone, code.otp);
+
+      return code.otp;
+    }
+
+    const generatedCode = await this.CreateOtpCode(user._id);
+
+    await this.mailService.sendOtpMail(user.phone, generatedCode.otp);
 
     return generatedCode.otp;
   }
@@ -69,6 +88,20 @@ class UserHelper {
     return await this.respository.CreateNewUser({ email, password });
   }
 
+  async CustomerCreateDB({ name, email, password, phone }) {
+    return await this.respository.CustomerCreate({ name, email, password, phone });
+  }
+
+  async CreateCustomerZoho(user) {
+    const { _id, email, phone, name } = user;
+
+    const userData = await this.zohoService.CreateCustomer({ email, phone, name });
+
+    const customerId = userData.contact.contact_id;
+
+    return await this.respository.UpdateCustomer({ _id, customerId });
+  }
+
   async VerifyOtp({ _id, otp }) {
     return await this.respository.VerifyOtp({ userId: _id, otp });
   }
@@ -84,6 +117,48 @@ class UserHelper {
 
   async FindByEmail({ email }) {
     return await this.respository.FindOneUserEmail({ email });
+  }
+
+  async CreateCustomer({ _id, email, name, password, image, phone, DOB, gender }) {
+    if (!_id) {
+      _id = new ObjectId();
+    }
+
+    const customerData = { email, name, password, image, phone, DOB, gender };
+
+    const filteredData = Object.fromEntries(Object.entries(customerData).filter(([key, value]) => value !== undefined));
+
+    const user = await this.respository.CreateCustomer(_id, filteredData);
+
+    await this.CreateCustomerZoho(user);
+
+    const token = await this.GenerateSignedJwt(user);
+
+    return token;
+  }
+
+  async CustomerSignup({ email }) {
+    const user = await this.respository.FindCustomerByEmail({ email });
+
+    const token = await this.GenerateSignedJwt(user);
+
+    return token;
+  }
+
+  async CustomerCreate({ email, password }) {
+    const data = await this.respository.CustomerCreate({ email, password });
+
+    const token = await this.GenerateSignedJwt(data);
+
+    return token;
+  }
+
+  async FindCustomerBYEmail({ email }) {
+    return await this.respository.FindCustomerBYEmail({ email });
+  }
+
+  async FindCustomerBYPhone({ phone }) {
+    return await this.respository.FindCustomerBYPhone({ phone });
   }
 }
 

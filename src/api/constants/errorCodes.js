@@ -18,6 +18,8 @@ export const COMMENT_NOT_FOUND = 2001;
 
 export const ZOHO_API_ERROR = 2002;
 
+export const ERROR_SENDING_OTP = 2003;
+
 export const COMMON_STATUS = {
   PENDING: "PENDING",
   ACTIVE: "ACTIVE",

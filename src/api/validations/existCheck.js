@@ -26,6 +26,38 @@ class ExistCheck {
     if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "User already exists with this Email ID. Please login", 400);
   }
 
+  async ForCustomerSignup({ email }) {
+    const userCount = await this.userRep.CountCustomerByEmail({ email });
+
+    if (userCount > 0) return true;
+  }
+
+  async ForCustomer({ email }) {
+    console.log("heelo");
+
+    const userCount = await this.userRep.CountCustomerByEmail({ email });
+
+    if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "User already exists with this Email ID. Please login", 400);
+  }
+
+  async ForCustomerVerfication({ email, phone }) {
+    if (phone) {
+      const userCount = await this.userRep.CountCustomerByEmail({ phone });
+
+      if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with provided phone no.", 400);
+    } else {
+      const userCount = await this.userRep.CountCustomerByEmail({ email });
+
+      if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with provided email id.", 400);
+    }
+  }
+
+  async ForCustomerPhone({ phone }) {
+    const userCount = await this.userRep.CountCustomerByEmail({ phone });
+
+    if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "User already exists with this Phone no. Please login", 400);
+  }
+
   async ForProduct(_id) {
     const productCount = await this.productRep.CountUserByProduct(_id);
 
