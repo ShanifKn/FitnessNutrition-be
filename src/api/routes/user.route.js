@@ -50,9 +50,9 @@ const UserRouter = (app) => {
 
       if (!user) {
         data = await service.CreateCustomer({ _id, email, name, password, image, phone, DOB, gender });
+      } else {
+        data = await service.CustomerSignup({ email });
       }
-
-      data = await service.CustomerSignup({ email });
 
       return res.status(200).json({ data, message: "Successfully logged in!" });
     })
@@ -78,6 +78,47 @@ const UserRouter = (app) => {
     })
   );
 
+  // @route   POST /login
+  // @desc    admin login
+  // @access  Public
+  // @fields  email,password
+  app.post(
+    "/customer-login",
+    LoginRateLimiter,
+    SchemaValidationForLogin,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { email, password } = req.body;
+
+      //Check if user already exists with given email and role
+      await userExists.ForCustomerLogin({ email });
+
+      const { message, token } = await service.CustomerLogin({ email, password });
+
+      return res.status(200).json({ token, message });
+    })
+  );
+
+  // @route   POST /login
+  // @desc    admin login
+  // @access  Public
+  // @fields  email,password
+  app.post(
+    "/customer-phone",
+    LoginRateLimiter,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { email, phone } = req.body;
+
+      //Check if user already exists with given email and role
+      await userExists.ForCustomerVerfication({ email, phone });
+
+      const { message } = await service.CustomerLoginPhone({ phone });
+
+      return res.status(200).json({ message });
+    })
+  );
+
   // @route   POST /otp-verify
   // @desc    otp verification
   // @access  Public
@@ -92,7 +133,7 @@ const UserRouter = (app) => {
       //Check if user already exists with given email and role
       await userExists.ForCustomerVerfication({ email, phone });
 
-      const { token, message } = await service.CustomerVerfication({ email, phone });
+      const { token, message } = await service.CustomerVerfication({ email, phone, otp });
 
       return res.status(200).json({ message, token });
     })
@@ -108,10 +149,10 @@ const UserRouter = (app) => {
     SchemaValidationForLogin,
     Validate,
     tryCatch(async (req, res) => {
-      const { email, password } = req.body;
+      const { email, password, phone } = req.body;
 
       //Check if user already exists with given email and role
-      await userExists.ForLogin({ email });
+      await userExists.ForCustomerVerfication({ email, phone });
 
       const { message } = await service.UserLogin({ email, password });
 

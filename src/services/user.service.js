@@ -66,12 +66,11 @@ class UserService {
 
     const user = await this.userHelper.CustomerCreateDB({ name, email, password, phone });
 
-    // if (user && email) await this.userHelper.SendOtpMail({ user });
+    if (user) await this.userHelper.SendOtpMail({ user });
 
     // if (user && phone) await this.userHelper.SendOtpPhone({ user });
 
-    await this.userHelper.CreateCustomerZoho(user);
-
+    //
     return { message: `Otp send successfully OTP` };
   }
 
@@ -94,7 +93,33 @@ class UserService {
 
     const token = await this.userHelper.GenerateSignedJwt(verified);
 
+    if (!user.verfiy) {
+      await this.userHelper.updateCustomerVerfiy({ _id });
+
+      await this.userHelper.CreateCustomerZoho(user);
+    }
+
     return { token: token, message: "User login successful" };
+  }
+
+  async CustomerLogin({ email, password }) {
+    const user = await this.userHelper.ValidateCustomerLogin({ email, password });
+
+    if (!user) return { message: "Invalid user" };
+
+    const token = await this.userHelper.GenerateSignedJwt(user);
+
+    return { token: token, message: "User login successful" };
+  }
+
+  async CustomerLoginPhone({ phone }) {
+    const user = await this.userHelper.FindCustomerBYPhoneVerified({ phone });
+
+    if (!user) return { message: "Invalid user" };
+
+    await this.userHelper.SendOtpPhone({ user });
+
+    return { message: `Otp send successfully OTP` };
   }
 }
 

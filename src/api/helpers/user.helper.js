@@ -26,6 +26,18 @@ class UserHelper {
     return user;
   }
 
+  async ValidateCustomerLogin({ email, password }) {
+    const user = await this.respository.FindCustomerBYEmailVerified({ email });
+
+    if (!user.password) throw new AppError(PASSWORD_MISSMATCHED, "Please login with google", 400);
+
+    const isMatched = await this.ValidateHashPassword(password, user.password);
+
+    if (!isMatched) throw new AppError(PASSWORD_MISSMATCHED, "Invalid password & email", 400);
+
+    return user;
+  }
+
   async ValidateHashPassword(password, hashPassword) {
     // Concatenate the user's input password with the private key
     const combinedValue = PRIVATE_KEY + password + PRIVATE_KEY;
@@ -53,14 +65,14 @@ class UserHelper {
     const code = await this.respository.OtpExist(user._id);
 
     if (code) {
-      await this.mailService.sendOtpSms(user.phone, code.otp);
+      // await this.mailService.sendOtpSms(user.phone, code.otp);
 
       return code.otp;
     }
 
     const generatedCode = await this.CreateOtpCode(user._id);
 
-    await this.mailService.sendOtpMail(user.phone, generatedCode.otp);
+    // await this.mailService.sendOtpSms(user.phone, generatedCode.otp);
 
     return generatedCode.otp;
   }
@@ -119,12 +131,16 @@ class UserHelper {
     return await this.respository.FindOneUserEmail({ email });
   }
 
+  async updateCustomerVerfiy({ _id }) {
+    return await this.respository.updateCustomerVerfiy({ _id });
+  }
+
   async CreateCustomer({ _id, email, name, password, image, phone, DOB, gender }) {
     if (!_id) {
       _id = new ObjectId();
     }
 
-    const customerData = { email, name, password, image, phone, DOB, gender };
+    const customerData = { email, name, password, image, phone, DOB, gender, verfiy: true };
 
     const filteredData = Object.fromEntries(Object.entries(customerData).filter(([key, value]) => value !== undefined));
 
@@ -159,6 +175,10 @@ class UserHelper {
 
   async FindCustomerBYPhone({ phone }) {
     return await this.respository.FindCustomerBYPhone({ phone });
+  }
+
+  async FindCustomerBYPhoneVerified({ phone }) {
+    return await this.respository.FindCustomerBYPhoneVerified({ phone });
   }
 }
 

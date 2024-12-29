@@ -33,29 +33,33 @@ class ExistCheck {
   }
 
   async ForCustomer({ email }) {
-    console.log("heelo");
-
     const userCount = await this.userRep.CountCustomerByEmail({ email });
 
-    if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "User already exists with this Email ID. Please login", 400);
+    if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "Email already registered. Please log in.", 400);
   }
 
   async ForCustomerVerfication({ email, phone }) {
     if (phone) {
-      const userCount = await this.userRep.CountCustomerByEmail({ phone });
+      const userCount = await this.userRep.CountCustomerByPhone({ phone });
 
-      if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with provided phone no.", 400);
+      if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with this phone number.", 400);
     } else {
       const userCount = await this.userRep.CountCustomerByEmail({ email });
 
-      if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with provided email id.", 400);
+      if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with this email.", 400);
     }
   }
 
-  async ForCustomerPhone({ phone }) {
-    const userCount = await this.userRep.CountCustomerByEmail({ phone });
+  async ForCustomerLogin({ email }) {
+    const userCount = await this.userRep.CountCustomerByEmail({ email });
 
-    if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "User already exists with this Phone no. Please login", 400);
+    if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with this email.", 400);
+  }
+
+  async ForCustomerPhone({ phone }) {
+    const userCount = await this.userRep.CountCustomerByPhone({ phone });
+
+    if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "Phone number already registered. Please log in.", 400);
   }
 
   async ForProduct(_id) {

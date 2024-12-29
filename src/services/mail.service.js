@@ -3,7 +3,7 @@ import { EMAIL_PASSWORD, EMAIL_USER_ID } from "../config/index.js";
 import { ERROR_SENDING_OTP } from "../api/constants/errorCodes.js";
 
 const transporter = nodemailer.createTransport({
-  host: "mail.fitnmuscles.com",
+  host: "smtp.ethereal.email",
   port: 587,
   auth: {
     user: EMAIL_USER_ID,

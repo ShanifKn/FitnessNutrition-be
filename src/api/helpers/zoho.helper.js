@@ -235,12 +235,13 @@ class ZohoHelper {
     const url = `https://www.zohoapis.com/books/v3/contacts?organization_id=${ZOHO_ORGANIZATION}`;
 
     const payload = {
-      contact_name: name,
+      contact_name: email,
       company_name: name, // Assuming the company name is the same as the contact name
       contact_persons: [
         {
           email: email,
           phone: phone,
+          first_name: name,
         },
       ],
     };
@@ -256,18 +257,16 @@ class ZohoHelper {
       });
 
       if (!response.ok) {
-        // console.log(response);
 
-        throw new AppError(ZOHO_API_ERROR, "1 ZOHO Api error", 400);
+        throw new AppError(ZOHO_API_ERROR, "User already registered. Please log in.", 400);
       }
 
       const data = await response.json();
 
       return data;
     } catch (e) {
-      // console.log(e);
 
-      throw new AppError(ZOHO_API_ERROR, "2 ZOHO Api error", 400);
+      throw new AppError(ZOHO_API_ERROR, "User already registered. Please log in.", 400);
     }
   }
 }

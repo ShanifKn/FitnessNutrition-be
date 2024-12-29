@@ -57,8 +57,19 @@ class UserRepository {
     return await newCustomer.save();
   }
 
+  async updateCustomerVerfiy(_id) {
+    return await Customer.updateOne({ _id }, { $set: { verfiy: true } });
+  }
+
   async FindCustomerBYEmail({ email }) {
     return await Customer.findOne({ email });
+  }
+  async FindCustomerBYEmailVerified({ email }) {
+    return await Customer.findOne({ email, verfiy: true });
+  }
+
+  async FindCustomerBYPhoneVerified({ phone }) {
+    return await Customer.findOne({ phone, verfiy: true });
   }
 
   async FindCustomerBYPhone({ phone }) {
