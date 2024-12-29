@@ -149,10 +149,10 @@ const UserRouter = (app) => {
     SchemaValidationForLogin,
     Validate,
     tryCatch(async (req, res) => {
-      const { email, password, phone } = req.body;
+      const { email, password } = req.body;
 
       //Check if user already exists with given email and role
-      await userExists.ForCustomerVerfication({ email, phone });
+      await userExists.ForLogin({ email });
 
       const { message } = await service.UserLogin({ email, password });
 
