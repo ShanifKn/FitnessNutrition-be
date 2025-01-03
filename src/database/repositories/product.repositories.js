@@ -165,7 +165,6 @@ class ProductRepository {
     return await Product.find({ pending: false }).populate("category", "name");
   }
 
-
   async GetPendingCounts() {
     return await Product.countDocuments({ pending: true });
   }
@@ -186,6 +185,17 @@ class ProductRepository {
 
   async CountUserByProduct(_id) {
     return await ProductVariant.countDocuments({ item_id: _id });
+  }
+
+  async getProductCount(currentDate) {
+    return await Product.countDocuments({ pending: false, publishDate: { $lt: currentDate } });
+  }
+
+  async getProductWithLimit({ currentDate, skip, limitInt }) {
+    return await Product.find({ pending: false, publishDate: { $lt: currentDate } })
+      .skip(skip) // Skip the first 'skip' number of products
+      .limit(limitInt) // Limit to the specified number of products
+      .exec();
   }
 }
 

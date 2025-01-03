@@ -273,6 +273,21 @@ const ProductRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+  // @route GET /
+  // @des get product for shop page
+  // @access public
+  app.get(
+    "/products",
+    Validate,
+    tryCatch(async (req, res) => {
+      const { page = 1, limit = 10 } = req.query;
+
+      const data = await service.getProductWithLimit({ page, limit });
+
+      return res.status(200).json({ data });
+    })
+  );
 };
 
 export default ProductRouter;

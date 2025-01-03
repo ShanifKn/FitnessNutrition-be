@@ -49,14 +49,14 @@ class UserHelper {
     const code = await this.respository.OtpExist(user._id);
 
     if (code) {
-      await this.mailService.sendOtpMail(user.email, code.otp);
+      // await this.mailService.sendOtpMail(user.email, code.otp);
 
       return code.otp;
     }
 
     const generatedCode = await this.CreateOtpCode(user._id);
 
-    await this.mailService.sendOtpMail(user.email, generatedCode.otp);
+    // await this.mailService.sendOtpMail(user.email, generatedCode.otp);
 
     return generatedCode.otp;
   }
@@ -142,7 +142,7 @@ class UserHelper {
 
     const customerData = { email, name, password, image, phone, DOB, gender, verfiy: true };
 
-    const filteredData = Object.fromEntries(Object.entries(customerData).filter(([key, value]) => value !== undefined));
+    const filteredData = Object.fromEntries(Object.entries(customerData).filter(([key, value]) => value !== undefined && value !== 0));
 
     const user = await this.respository.CreateCustomer(_id, filteredData);
 

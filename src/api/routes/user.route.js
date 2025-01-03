@@ -51,6 +51,7 @@ const UserRouter = (app) => {
       if (!user) {
         data = await service.CreateCustomer({ _id, email, name, password, image, phone, DOB, gender });
       } else {
+
         data = await service.CustomerSignup({ email });
       }
 

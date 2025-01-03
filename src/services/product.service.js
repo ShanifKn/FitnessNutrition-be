@@ -1,4 +1,6 @@
+import { INCORRECT_OTP, UNAUTHORIZED_USER } from "../api/constants/errorCodes.js";
 import ProductHelper from "../api/helpers/product.helper.js";
+import AppError from "../utils/appError.js";
 
 class ProductService {
   constructor() {
@@ -177,6 +179,20 @@ class ProductService {
 
   async getVariant(_id) {
     return await this.helper.getVariant(_id);
+  }
+
+  async getProductWithLimit({ page, limit }) {
+    const skip = (page - 1) * limit; // Calculate how many records to skip
+
+    // Convert page and limit to integers
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+
+    // if (pageInt <= 0 || limitInt <= 0) {
+    //   throw new AppError(UNAUTHORIZED_USER, "Invalid page or limit", 400);
+    // }
+
+    return this.helper.getProductWithLimit({ pageInt, limitInt, skip });
   }
 }
 

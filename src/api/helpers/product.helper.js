@@ -289,8 +289,6 @@ class ProductHelper {
       productBrand,
     };
 
-    
-
     const filteredProductData = Object.fromEntries(Object.entries(productData).filter(([key, value]) => value !== undefined));
 
     // Pass the filtered data to the helper function
@@ -299,7 +297,6 @@ class ProductHelper {
 
   async GetProductToType() {
     const product = await this.repository.GetProducts();
-
 
     const groupedProducts = product.reduce((result, product) => {
       // Assuming `analytics` is an array of strings
@@ -325,6 +322,20 @@ class ProductHelper {
 
   async getVariant(_id) {
     return this.repository.getVariant(_id);
+  }
+
+  async getProductWithLimit({ pageInt, limitInt, skip }) {
+    const currentDate = new Date();
+
+    const totalProducts = await this.repository.getProductCount(currentDate);
+
+    const products = await this.repository.getProductWithLimit({ currentDate, skip, limitInt });
+
+    const totalPages = Math.ceil(totalProducts / limitInt);
+
+    const data = { data: products, totalProducts, totalPages, currentPage: pageInt, pageSize: limitInt };
+
+    return data;
   }
 }
 
