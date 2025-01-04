@@ -20,6 +20,19 @@ const ZohoRouter = (app) => {
     })
   );
 
+  app.post(
+    "/create-cart",
+    // Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { user, items } = req.body;
+
+      const data = await service.CreateCart({ user, items });
+
+      return res.status(200).json({ data });
+    })
+  );
+
   app.get(
     "/get-ZohoProducts",
     Validate,
@@ -29,7 +42,6 @@ const ZohoRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
-
 };
 
 export default ZohoRouter;

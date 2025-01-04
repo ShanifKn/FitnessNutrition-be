@@ -197,6 +197,10 @@ class ProductRepository {
       .limit(limitInt) // Limit to the specified number of products
       .exec();
   }
+
+  async ProductDetails(productId) {
+    return await Product.findOne({ _id: productId }).select(" rate ")
+  }
 }
 
 export default ProductRepository;
