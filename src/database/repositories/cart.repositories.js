@@ -47,8 +47,8 @@ class CartRepository {
     return await Wishlist.updateOne(
       { _id },
       {
-        $set: {
-          items: items,
+        $push: {
+          items: { $each: items },
         },
       }
     );
