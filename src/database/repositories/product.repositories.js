@@ -187,19 +187,24 @@ class ProductRepository {
     return await ProductVariant.countDocuments({ item_id: _id });
   }
 
-  async getProductCount(currentDate) {
-    return await Product.countDocuments({ pending: false, publishDate: { $lt: currentDate } });
+  async getProductCount(currentDate, filter) {
+    return await Product.countDocuments({ ...filter, pending: false, publishDate: { $lt: currentDate } });
   }
 
-  async getProductWithLimit({ currentDate, skip, limitInt }) {
-    return await Product.find({ pending: false, publishDate: { $lt: currentDate } })
+  async getProductWithLimit({ currentDate, skip, limitInt, filter = {} }) {
+    return await Product.find({
+      ...filter, // Apply the dynamic filter (for category or other fields)
+      pending: false,
+      publishDate: { $lt: currentDate },
+    })
       .skip(skip) // Skip the first 'skip' number of products
       .limit(limitInt) // Limit to the specified number of products
+      .select("_id name rate rating maxDiscount images") // Select specific fields to return
       .exec();
   }
 
   async ProductDetails(productId) {
-    return await Product.findOne({ _id: productId }).select(" rate ")
+    return await Product.findOne({ _id: productId }).select(" rate ");
   }
 }
 

@@ -181,7 +181,7 @@ class ProductService {
     return await this.helper.getVariant(_id);
   }
 
-  async getProductWithLimit({ page, limit }) {
+  async getProductWithLimit({ page, limit, categoryId }) {
     const skip = (page - 1) * limit; // Calculate how many records to skip
 
     // Convert page and limit to integers
@@ -192,7 +192,7 @@ class ProductService {
     //   throw new AppError(UNAUTHORIZED_USER, "Invalid page or limit", 400);
     // }
 
-    return this.helper.getProductWithLimit({ pageInt, limitInt, skip });
+    return this.helper.getProductWithLimit({ pageInt, limitInt, skip, categoryId });
   }
 }
 

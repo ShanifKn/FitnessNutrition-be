@@ -281,9 +281,10 @@ const ProductRouter = (app) => {
     "/products",
     Validate,
     tryCatch(async (req, res) => {
-      const { page = 1, limit = 10 } = req.query;
+      const { page = 1, limit = 10, categoryId = "" } = req.query;
 
-      const data = await service.getProductWithLimit({ page, limit });
+      const data = await service.getProductWithLimit({ page, limit, categoryId });
+
 
       return res.status(200).json({ data });
     })

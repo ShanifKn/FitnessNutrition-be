@@ -324,16 +324,36 @@ class ProductHelper {
     return this.repository.getVariant(_id);
   }
 
-  async getProductWithLimit({ pageInt, limitInt, skip }) {
+  async getProductWithLimit({ pageInt, limitInt, skip, categoryId }) {
     const currentDate = new Date();
 
-    const totalProducts = await this.repository.getProductCount(currentDate);
+    // Define the filter conditionally
+    const filter = categoryId
+      ? {
+          $or: [{ category: categoryId }, { subCategory: categoryId }, { parentCategory: categoryId }],
+        }
+      : {}; // If no categoryId is provided, return all products
 
-    const products = await this.repository.getProductWithLimit({ currentDate, skip, limitInt });
+    // Fetch the total number of products based on the filter
+    const totalProducts = await this.repository.getProductCount(currentDate, filter);
+
+    // Fetch the paginated products based on the filter
+    const products = await this.repository.getProductWithLimit({
+      currentDate,
+      skip,
+      limitInt,
+      filter,
+    });
 
     const totalPages = Math.ceil(totalProducts / limitInt);
 
-    const data = { data: products, totalProducts, totalPages, currentPage: pageInt, pageSize: limitInt };
+    const data = {
+      data: products,
+      totalProducts,
+      totalPages,
+      currentPage: pageInt,
+      pageSize: limitInt,
+    };
 
     return data;
   }
