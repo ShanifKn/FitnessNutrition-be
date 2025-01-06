@@ -42,6 +42,8 @@ class ExistCheck {
     if (phone) {
       const userCount = await this.userRep.CountCustomerByPhone({ phone });
 
+      console.log(userCount)
+
       if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with this phone number.", 400);
     } else {
       const userCount = await this.userRep.CountCustomerByEmail({ email });

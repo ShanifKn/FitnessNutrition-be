@@ -1,5 +1,6 @@
 import { MainCategory } from "../models/category.model.js";
 import { SubCategory } from "../models/subCategory.model.js";
+import mongoose, { Schema } from "mongoose";
 
 class CategoryRepository {
   async CreateCategory({ image, _id, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory, subCategory }) {
@@ -110,6 +111,46 @@ class CategoryRepository {
       }
     );
   }
+
+  async GetCategoryDetailForTitle({ _id }) {
+  
+    return await MainCategory.aggregate([
+      // Match the main category, subcategory, or nested subcategory based on the provided _id
+      {
+        $match: {
+          $or: [
+            { _id: new mongoose.Types.ObjectId(_id) }, // Match main category by _id
+            { "subCategory._id": new mongoose.Types.ObjectId(_id) }, // Match subcategory by _id
+            { "subCategory.subCategory._id": new mongoose.Types.ObjectId(_id) }, // Match nested subcategory by _id
+          ],
+        },
+      },
+      // Project only the matched part (main category or subcategory)
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          subCategory: {
+            $cond: {
+              if: { $eq: ["$subCategory._id", new mongoose.Types.ObjectId(_id)] }, // If subcategory matches
+              then: "$subCategory", // Return the matched subcategory
+              else: {
+                $cond: {
+                  if: { $eq: ["$subCategory.subCategory._id", new mongoose.Types.ObjectId(_id)] }, // If nested subcategory matches
+                  then: "$subCategory.subCategory", // Return the matched nested subcategory
+                  else: null,
+                },
+              },
+            },
+          },
+        },
+      },
+      // Remove null subcategories (those that don't match)
+    ]);
+  }
+  
+  
+  
 }
 
 export default CategoryRepository;

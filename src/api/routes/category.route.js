@@ -87,6 +87,33 @@ const CategoryRouter = (app) => {
     })
   );
 
+
+
+
+
+  // @route GET /
+  //@desc get  categories details for shop
+  //@access private
+  app.get(
+    "/category-title/:id",
+    Validate,
+    tryCatch(async (req, res) => {
+      const _id = req.params.id;
+
+      const data = await service.GetCategoryDetailForTitle({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
+
+
+
+
+
+
+
   // @route GET /
   //@desc get  NonFeatured category all
   //@access private

@@ -36,6 +36,10 @@ class CategoryService {
   async UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image }) {
     return await this.categoryhelper.UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image });
   }
+
+  async GetCategoryDetailForTitle({ _id }) {
+    return await this.categoryhelper.GetCategoryDetailForTitle({ _id });
+  }
 }
 
 export default CategoryService;

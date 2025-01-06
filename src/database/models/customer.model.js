@@ -32,14 +32,18 @@ const customerSchema = new mongoose.Schema(
 // Add TTL index for `expireAt`
 customerSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
-// Middleware to set `expireAt` dynamically based on `verfiy`
-customerSchema.pre("save", function (next) {
-  if (!this.verfiy) {
-    // Set the `expireAt` field to 10 minutes from now if `verfiy` is false
-    this.expireAt = new Date(Date.now() + 10 * 60 * 1000);
-  } else {
-    // Clear the `expireAt` field if `verfiy` is true
-    this.expireAt = undefined;
+// Middleware for dynamic `expireAt` updates
+customerSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+  if (update && update.verfiy !== undefined) {
+    if (update.verfiy) {
+      this.setUpdate({ ...update, expireAt: undefined });
+    } else {
+      this.setUpdate({
+        ...update,
+        expireAt: new Date(Date.now() + 10 * 60 * 1000),
+      });
+    }
   }
   next();
 });

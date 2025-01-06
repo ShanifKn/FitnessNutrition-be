@@ -49,6 +49,10 @@ class CategoryHelper {
 
     return { message: "Category update successfully" };
   }
+
+  async GetCategoryDetailForTitle({ _id }) {
+    return await this.categoryRepository.GetCategoryDetailForTitle({ _id });
+  }
 }
 
 export default CategoryHelper;

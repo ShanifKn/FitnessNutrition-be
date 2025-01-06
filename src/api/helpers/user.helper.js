@@ -49,14 +49,14 @@ class UserHelper {
     const code = await this.respository.OtpExist(user._id);
 
     if (code) {
-      // await this.mailService.sendOtpMail(user.email, code.otp);
+      await this.mailService.sendOtpMail(user.email, code.otp);
 
       return code.otp;
     }
 
     const generatedCode = await this.CreateOtpCode(user._id);
 
-    // await this.mailService.sendOtpMail(user.email, generatedCode.otp);
+    await this.mailService.sendOtpMail(user.email, generatedCode.otp);
 
     return generatedCode.otp;
   }
@@ -65,14 +65,14 @@ class UserHelper {
     const code = await this.respository.OtpExist(user._id);
 
     if (code) {
-      // await this.mailService.sendOtpSms(user.phone, code.otp);
+      await this.mailService.sendOtpSms(user.phone, code.otp);
 
       return code.otp;
     }
 
     const generatedCode = await this.CreateOtpCode(user._id);
 
-    // await this.mailService.sendOtpSms(user.phone, generatedCode.otp);
+    await this.mailService.sendOtpSms(user.phone, generatedCode.otp);
 
     return generatedCode.otp;
   }
