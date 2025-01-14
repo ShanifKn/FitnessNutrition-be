@@ -8,7 +8,7 @@ const customerSchema = new mongoose.Schema(
     password: { type: String },
     image: { type: String },
     phone: { type: Number, unique: true },
-    DOB: { type: Date },
+    dob: { type: Date },
     gender: { type: String },
     verfiy: { type: Boolean, default: false },
     address: [
@@ -21,7 +21,7 @@ const customerSchema = new mongoose.Schema(
         pin: { type: Number },
         city: { type: String },
         country: { type: String },
-        delivery: { type: Boolean },
+        delivery: { type: Boolean, default: false },
       },
     ],
     expireAt: { type: Date, default: undefined }, // TTL field

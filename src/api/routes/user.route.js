@@ -1,6 +1,7 @@
 import UserService from "../../services/user.service.js";
 import { tryCatch } from "../../utils/index.js";
 import { LoginRateLimiter } from "../middlewares/apiLimiter.js";
+import Authentication from "../middlewares/authentication.js";
 import ExistCheck from "../validations/existCheck.js";
 import { SchemaValidationForLogin } from "../validations/schema.validation.js";
 import Validate from "../validations/validator.js";
@@ -51,7 +52,6 @@ const UserRouter = (app) => {
       if (!user) {
         data = await service.CreateCustomer({ _id, email, name, password, image, phone, DOB, gender });
       } else {
-
         data = await service.CustomerSignup({ email });
       }
 
@@ -194,6 +194,79 @@ const UserRouter = (app) => {
       const { message } = await service.VerifyOtp({ email, otp });
 
       return res.status(200).json({ message });
+    })
+  );
+
+  app.post(
+    "/create-address",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const userId = req.user._id;
+
+      const { _id, type, flatno, flatname, street, landMark, pin, city, country, delivery } = req.body;
+
+      const data = await service.CreateAddress({ userId, _id, type, flatno, flatname, street, landMark, pin, city, country, delivery });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.get(
+    "/userDetails",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const userId = req.user._id;
+
+      const data = await service.GetUserDetails({ userId });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.delete(
+    "/delete-address/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const userId = req.user._id;
+
+      const { _id } = req.params;
+
+      const { message } = await service.DeleteAddress({ userId, _id });
+
+      return res.status(200).json({ message });
+    })
+  );
+
+  app.post(
+    "/delivery-address",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const userId = req.user._id;
+
+      const { _id } = req.body;
+
+      const data = await service.DeliveryAddress({ userId, _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.post(
+    "/update-user",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const userId = req.user._id;
+
+      const { email, name, image, phone, dob, gender } = req.body;
+
+      const data = await service.UpdateUser({ userId, email, name, image, phone, dob, gender });
+
+      return res.status(200).json({ data });
     })
   );
 };

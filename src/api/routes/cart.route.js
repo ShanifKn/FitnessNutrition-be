@@ -14,9 +14,11 @@ const CartRouter = (app) => {
     Authentication,
     Validate,
     tryCatch(async (req, res) => {
-      const { user, items } = req.body;
+      const user = req.user._id;
 
-      const data = await service.Create({ user, items });
+      const { productId, quantity } = req.body;
+
+      const data = await service.Create({ user, productId, quantity });
 
       return res.status(200).json({ data });
     })
@@ -27,9 +29,12 @@ const CartRouter = (app) => {
     Authentication,
     Validate,
     tryCatch(async (req, res) => {
-      const { _id, items } = req.body;
+      const user = req.user._id;
 
-      const data = await service.UpdateCart({ _id, items });
+      const { productId, quantity } = req.body;
+
+
+      const data = await service.UpdateCart({ user, productId, quantity });
 
       return res.status(200).json({ data });
     })
@@ -79,7 +84,7 @@ const CartRouter = (app) => {
     Authentication,
     Validate,
     tryCatch(async (req, res) => {
-      const  items  = req.body;
+      const items = req.body;
 
       const user = req.user._id;
 

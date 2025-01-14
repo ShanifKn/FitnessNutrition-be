@@ -7,23 +7,21 @@ class CartHelper {
     this.repository = new CartRepository();
   }
 
-  async FetchProducts({ items }) {
+  async FetchProducts({ productId, quantity }) {
     const cartItems = [];
 
-    for (const item of items) {
-      const product = await this.productRepository.ProductDetails(item.productId);
+    const product = await this.productRepository.ProductDetails(productId);
 
-      const price = product.rate;
-      const total = price * item.quantity; // Calculate total for this product
+    const price = product.rate;
+    const total = price * quantity; // Calculate total for this product
 
-      // Add to the cart items array
-      cartItems.push({
-        product: item.productId,
-        quantity: item.quantity,
-        price: product.rate,
-        total,
-      });
-    }
+    // Add to the cart items array
+    cartItems.push({
+      product: productId,
+      quantity: quantity,
+      price: product.rate,
+      total,
+    });
 
     return cartItems;
   }
@@ -32,8 +30,8 @@ class CartHelper {
     return await this.repository.CreateCart({ user, fetchProduct });
   }
 
-  async UpdateCart({ _id, featchProduct }) {
-    return await this.repository.UpdateCart({ _id, featchProduct });
+  async UpdateCart({ user, productId, quantity  }) {
+    return await this.repository.UpdateCart({ user, productId, quantity  });
   }
 
   async GetCarts({ _id }) {
@@ -62,6 +60,14 @@ class CartHelper {
 
   async DeleteProductFromWishlist({ userId, _id }) {
     return await this.repository.DeleteProductFromWishlist({ userId, _id });
+  }
+
+  async GetUserCart({ user }) {
+    return await this.repository.GetUserCart({ user });
+  }
+
+  async UpdateUserCart({ user, fetchProduct }) {
+    return await this.repository.UpdateUserCart({ user, fetchProduct });
   }
 }
 

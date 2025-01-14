@@ -5,17 +5,20 @@ class CartService {
     this.helper = new CartHelper();
   }
 
-  async UpdateCart({ _id, items }) {
-    const featchProduct = await this.helper.FetchProducts({ items });
-
-    return await this.helper.UpdateCart({ _id, featchProduct });
+  async UpdateCart({ user, productId, quantity }) {
+    return await this.helper.UpdateCart({ user, productId, quantity });
   }
 
-  async Create({ user, items }) {
-    console.log(user, items);
+  async Create({ user, productId, quantity }) {
+    const userData = await this.helper.GetUserCart({ user });
 
-    const fetchProduct = await this.helper.FetchProducts({ items });
-    return await this.helper.CreateCart({ user, fetchProduct });
+    const fetchProduct = await this.helper.FetchProducts({ productId, quantity });
+
+    if (!userData) {
+      return await this.helper.CreateCart({ user, fetchProduct });
+    } else {
+      return await this.helper.UpdateUserCart({ user, fetchProduct });
+    }
   }
 
   async GetCarts({ _id }) {

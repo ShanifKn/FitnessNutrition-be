@@ -180,6 +180,31 @@ class UserHelper {
   async FindCustomerBYPhoneVerified({ phone }) {
     return await this.respository.FindCustomerBYPhoneVerified({ phone });
   }
+
+  async CreateAddress({ userId, _id, type, flatno, flatname, street, landMark, pin, city, country, delivery }) {
+    if (!_id) {
+      _id = new ObjectId();
+    }
+    return await this.respository.CreateAddress({ userId, _id, type, flatno, flatname, street, landMark, pin, city, country, delivery });
+  }
+
+  async GetUserDetails({ userId }) {
+    return await this.respository.GetUserDetails({ userId });
+  }
+
+  async DeleteAddress({ userId, _id }) {
+    await this.respository.DeleteAddress({ userId, _id });
+
+    return { message: "Address as removed!" };
+  }
+
+  async DeliveryAddress({ userId, _id }) {
+    return await this.respository.DeliveryAddress({ userId, _id });
+  }
+
+  async UpdateUser({ userId, email, name, image, phone, dob, gender }) {
+    return await this.respository.UpdateUser({ userId, email, name, image, phone, dob, gender  });
+  }
 }
 
 export default UserHelper;

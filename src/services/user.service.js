@@ -121,6 +121,26 @@ class UserService {
 
     return { message: `Otp send successfully OTP` };
   }
+
+  async CreateAddress({ userId, _id, type, flatno, flatname, street, landMark, pin, city, country, delivery }) {
+    return await this.userHelper.CreateAddress({ userId, _id, type, flatno, flatname, street, landMark, pin, city, country, delivery });
+  }
+
+  async GetUserDetails({ userId }) {
+    return await this.userHelper.GetUserDetails({ userId });
+  }
+
+  async DeleteAddress({ userId, _id }) {
+    return await this.userHelper.DeleteAddress({ userId, _id });
+  }
+
+  async DeliveryAddress({ userId, _id }) {
+    return await this.userHelper.DeliveryAddress({ userId, _id });
+  }
+
+  async UpdateUser({userId, email, name, image, phone, dob, gender }) {
+    return await this.userHelper.UpdateUser({ userId, email, name, image, phone, dob, gender });
+  }
 }
 
 export default UserService;
