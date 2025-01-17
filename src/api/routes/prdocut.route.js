@@ -285,6 +285,48 @@ const ProductRouter = (app) => {
 
       const data = await service.getProductWithLimit({ page, limit, categoryId });
 
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route GET /
+  // @des get product for shop page
+  // @access public
+  app.get(
+    "/shop-filter",
+    Validate,
+    tryCatch(async (req, res) => {
+      const data = await service.getCategoryFilter();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route GET /
+  // @des get product for shop page
+  // @access public
+  app.post(
+    "/product-filter",
+    Validate,
+    tryCatch(async (req, res) => {
+      const { productBrands, parentCategory, dietary, page = 1, limit = 10 } = req.body;
+
+      const data = await service.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route GET /
+  // @des get product for shop page
+  // @access public
+  app.get(
+    "/lasted-products",
+    Validate,
+    tryCatch(async (req, res) => {
+
+
+      const data = await service.GetLastedProduct();
 
       return res.status(200).json({ data });
     })

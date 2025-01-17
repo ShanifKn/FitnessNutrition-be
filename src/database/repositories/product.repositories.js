@@ -206,6 +206,32 @@ class ProductRepository {
   async ProductDetails(productId) {
     return await Product.findOne({ _id: productId }).select(" rate ");
   }
+
+  async GetBrandName() {
+    return await Product.find().select(" productBrand ");
+  }
+
+  async GetCategoryFilterProducts({ query, skip, limitInt, currentDate }) {
+    return await Product.find({
+      ...query,
+      pending: false,
+      publishDate: { $lt: currentDate },
+    })
+      .skip(skip)
+      .limit(limitInt)
+      .select("_id name rate rating maxDiscount images") // Select specific fields to return
+      .exec();
+  }
+
+  async GetLastedProduct({ currentDate }) {
+    return await Product.find({
+      pending: false,
+      publishDate: { $lt: currentDate },
+    })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("_id name rate rating maxDiscount images"); // Select specific fields to return
+  }
 }
 
 export default ProductRepository;

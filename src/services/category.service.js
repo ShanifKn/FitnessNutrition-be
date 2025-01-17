@@ -40,6 +40,18 @@ class CategoryService {
   async GetCategoryDetailForTitle({ _id }) {
     return await this.categoryhelper.GetCategoryDetailForTitle({ _id });
   }
+
+  async GetAllFeaturedCategoryAdmin() {
+    return await this.categoryhelper.GetAllFeaturedCategoryAdmin();
+  }
+
+  async GetDietary() {
+    return await this.categoryhelper.GetDietary();
+  }
+
+  async CreateDietary({ _id, title }) {
+    return await this.categoryhelper.CreateDietary({ _id, title });
+  }
 }
 
 export default CategoryService;

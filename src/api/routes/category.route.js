@@ -87,10 +87,6 @@ const CategoryRouter = (app) => {
     })
   );
 
-
-
-
-
   // @route GET /
   //@desc get  categories details for shop
   //@access private
@@ -105,14 +101,6 @@ const CategoryRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
-
-
-
-
-
-
-
-
 
   // @route GET /
   //@desc get  NonFeatured category all
@@ -135,6 +123,20 @@ const CategoryRouter = (app) => {
     Validate,
     tryCatch(async (req, res) => {
       const data = await service.GetAllFeaturedCategory();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route GET /
+  //@desc get  Featured category all
+  //@access public
+  app.get(
+    "/featured-category-admin",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const data = await service.GetAllFeaturedCategoryAdmin();
 
       return res.status(200).json({ data });
     })
@@ -169,6 +171,35 @@ const CategoryRouter = (app) => {
       const { message } = await service.UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image });
 
       return res.status(200).json({ message });
+    })
+  );
+
+  // @route GET /
+  //@desc get  Featured category all
+  //@access public
+  app.get(
+    "/dietary",
+    Validate,
+    tryCatch(async (req, res) => {
+      const data = await service.GetDietary();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route GET /
+  //@desc get  Featured category all
+  //@access public
+  app.post(
+    "/dietary",
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id, title } = req.body;
+
+
+      const data = await service.CreateDietary({ _id, title });
+
+      return res.status(200).json({ data });
     })
   );
 };

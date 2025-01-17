@@ -192,7 +192,19 @@ class ProductService {
     //   throw new AppError(UNAUTHORIZED_USER, "Invalid page or limit", 400);
     // }
 
-    return this.helper.getProductWithLimit({ pageInt, limitInt, skip, categoryId });
+    return await this.helper.getProductWithLimit({ pageInt, limitInt, skip, categoryId });
+  }
+
+  async getCategoryFilter() {
+    return await this.helper.getCategoryFilter();
+  }
+
+  async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit }) {
+    return await this.helper.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit });
+  }
+
+  async GetLastedProduct() {
+    return await this.helper.GetLastedProduct();
   }
 }
 

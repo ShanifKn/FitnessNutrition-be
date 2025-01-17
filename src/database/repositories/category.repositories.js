@@ -1,4 +1,5 @@
 import { MainCategory } from "../models/category.model.js";
+import { Dietary } from "../models/dietary.mode.js";
 import { SubCategory } from "../models/subCategory.model.js";
 import mongoose, { Schema } from "mongoose";
 
@@ -13,6 +14,10 @@ class CategoryRepository {
 
   async GetAllTheCategory() {
     return await MainCategory.find({ visibility: true });
+  }
+
+  async GetAllTheCategoryFilter() {
+    return await MainCategory.find({ visibility: true }).select(" title ");
   }
 
   async GetNonFeaturedCategory() {
@@ -112,8 +117,73 @@ class CategoryRepository {
     );
   }
 
+  async GetAllFeaturedCategoryAdmin() {
+    const featuredCategories = await MainCategory.aggregate([
+      {
+        $match: {
+          $or: [{ featuredCategory: true }, { "subCategory.featuredCategory": true }],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          image: 1,
+          featuredCategory: 1,
+          publishDate: 1,
+          subCategory: {
+            $filter: {
+              input: "$subCategory",
+              as: "sub",
+              cond: { $eq: ["$$sub.featuredCategory", true] },
+            },
+          },
+        },
+      },
+    ]);
+
+    // Transform and combine all featured categories into a single array
+    const combinedFeatured = [];
+
+    featuredCategories.forEach((category) => {
+      // Add parent if it's featured
+      if (category.featuredCategory) {
+        combinedFeatured.push({
+          _id: category._id,
+          title: category.title,
+          image: category.image,
+          type: "parent",
+          parentId: null,
+          parentTitle: null,
+          publishDate: category.publishDate,
+        });
+      }
+
+      // Add featured subcategories
+      if (category.subCategory && category.subCategory.length > 0) {
+        const featuredSubs = category.subCategory.map((sub) => ({
+          _id: sub._id,
+          title: sub.title,
+          image: sub.image,
+          type: "child",
+          parentId: category._id,
+          parentTitle: category.title,
+          publishDate: category.publishDate,
+        }));
+        combinedFeatured.push(...featuredSubs);
+      }
+    });
+
+    // Sort by type (parents first) and then by title
+    return combinedFeatured.sort((a, b) => {
+      if (a.type !== b.type) {
+        return a.type === "parent" ? -1 : 1;
+      }
+      return a.title.localeCompare(b.title);
+    });
+  }
+
   async GetCategoryDetailForTitle({ _id }) {
-  
     return await MainCategory.aggregate([
       // Match the main category, subcategory, or nested subcategory based on the provided _id
       {
@@ -148,9 +218,14 @@ class CategoryRepository {
       // Remove null subcategories (those that don't match)
     ]);
   }
-  
-  
-  
+
+  async GetDietary() {
+    return await Dietary.find();
+  }
+
+  async CreateDietary({ _id, title }) {
+    return await Dietary.findByIdAndUpdate({ _id }, { title }, { upsert: true, new: true });
+  }
 }
 
 export default CategoryRepository;

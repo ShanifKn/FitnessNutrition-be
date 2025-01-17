@@ -1,8 +1,10 @@
+import CategoryRepository from "../../database/repositories/category.repositories.js";
 import ProductRepository from "../../database/repositories/product.repositories.js";
 
 class ProductHelper {
   constructor() {
     this.repository = new ProductRepository();
+    this.categoryRepository = new CategoryRepository();
   }
 
   async GetPendingProducts() {
@@ -356,6 +358,90 @@ class ProductHelper {
     };
 
     return data;
+  }
+
+  async getCategoryFilter() {
+    let data = {};
+
+    const catgory = await this.categoryRepository.GetAllTheCategoryFilter();
+
+    const dietary = await this.categoryRepository.GetDietary();
+
+    const brand = await this.repository.GetBrandName();
+
+    const brandCount = {};
+    for (const item of brand) {
+      const brandName = item.productBrand?.trim(); // Remove trailing spaces if any
+      if (brandName) {
+        brandCount[brandName] = (brandCount[brandName] || 0) + 1;
+      }
+    }
+
+    // Step 2: Filter brands that occur more than three times
+    const uniqueBrands = [];
+    const seenBrands = new Set();
+
+    for (const item of brand) {
+      const brandName = item.productBrand?.trim();
+      if (brandName && brandCount[brandName] > 3 && !seenBrands.has(brandName)) {
+        uniqueBrands.push(item); // Add the first occurrence of the brand
+        seenBrands.add(brandName);
+      }
+    }
+
+    data = {
+      category: catgory,
+      dietary: dietary,
+      brand: uniqueBrands,
+    };
+
+    return data;
+  }
+
+  async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit }) {
+    const query = {};
+    const currentDate = new Date();
+
+    console.log(productBrands, dietary);
+
+    if (productBrands && productBrands.length > 0) {
+      query.productBrand = { $in: productBrands }; // Match product brands in the array
+    }
+    if (parentCategory && parentCategory.length > 0) {
+      query.parentCategory = { $in: parentCategory }; // Match parentCategory in the array
+    }
+    if (dietary && dietary.length > 0) {
+      query.dietary = { $in: dietary }; // Match all dietary values
+    }
+
+    // Pagination calculations
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+    const skip = (pageInt - 1) * limitInt;
+
+    const totalProducts = await this.repository.getProductCount(currentDate, query);
+
+    const products = await this.repository.GetCategoryFilterProducts({ query, skip, limitInt, currentDate });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalProducts / limitInt);
+
+    // Response
+    const data = {
+      data: products,
+      totalProducts,
+      totalPages,
+      currentPage: pageInt,
+      pageSize: limitInt,
+    };
+
+    return data;
+  }
+
+  async GetLastedProduct() {
+    const currentDate = new Date();
+
+    return await this.repository.GetLastedProduct({ currentDate });
   }
 }
 

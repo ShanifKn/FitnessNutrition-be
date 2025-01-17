@@ -53,6 +53,22 @@ class CategoryHelper {
   async GetCategoryDetailForTitle({ _id }) {
     return await this.categoryRepository.GetCategoryDetailForTitle({ _id });
   }
+
+  async GetAllFeaturedCategoryAdmin() {
+    return await this.categoryRepository.GetAllFeaturedCategoryAdmin();
+  }
+
+  async GetDietary() {
+    return await this.categoryRepository.GetDietary();
+  }
+
+  async CreateDietary({ _id, title }) {
+    if (!_id) {
+      _id = new ObjectId();
+    }
+
+    return await this.categoryRepository.CreateDietary({ _id, title });
+  }
 }
 
 export default CategoryHelper;
