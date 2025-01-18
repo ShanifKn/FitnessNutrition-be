@@ -199,8 +199,8 @@ class ProductService {
     return await this.helper.getCategoryFilter();
   }
 
-  async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit }) {
-    return await this.helper.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit });
+  async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
+    return await this.helper.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit, categoryId });
   }
 
   async GetLastedProduct() {

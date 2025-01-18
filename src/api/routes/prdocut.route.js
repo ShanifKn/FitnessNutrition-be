@@ -309,9 +309,9 @@ const ProductRouter = (app) => {
     "/product-filter",
     Validate,
     tryCatch(async (req, res) => {
-      const { productBrands, parentCategory, dietary, page = 1, limit = 10 } = req.body;
+      const { productBrands, parentCategory, dietary, categoryId, page = 1, limit = 10 } = req.body;
 
-      const data = await service.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit });
+      const data = await service.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit , categoryId});
 
       return res.status(200).json({ data });
     })
@@ -324,8 +324,6 @@ const ProductRouter = (app) => {
     "/lasted-products",
     Validate,
     tryCatch(async (req, res) => {
-
-
       const data = await service.GetLastedProduct();
 
       return res.status(200).json({ data });

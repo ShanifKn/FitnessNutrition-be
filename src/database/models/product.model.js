@@ -45,7 +45,7 @@ const ItemSchema = new mongoose.Schema(
     cf_usage_unit: { type: String },
     cf_usage_unit_unformatted: { type: String },
 
-    parentCategory: { type: Schema.Types.ObjectId },
+    parentCategory: { type: Schema.Types.ObjectId, ref: "MainCategory" },
 
     subCategory: { type: Schema.Types.ObjectId },
 

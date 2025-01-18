@@ -200,6 +200,7 @@ class ProductRepository {
       .skip(skip) // Skip the first 'skip' number of products
       .limit(limitInt) // Limit to the specified number of products
       .select("_id name rate rating maxDiscount images") // Select specific fields to return
+      .populate("parentCategory", " title ")
       .exec();
   }
 
@@ -220,6 +221,7 @@ class ProductRepository {
       .skip(skip)
       .limit(limitInt)
       .select("_id name rate rating maxDiscount images") // Select specific fields to return
+      .populate("parentCategory", " title ")
       .exec();
   }
 

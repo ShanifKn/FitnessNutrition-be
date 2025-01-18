@@ -398,11 +398,9 @@ class ProductHelper {
     return data;
   }
 
-  async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit }) {
+  async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
     const query = {};
     const currentDate = new Date();
-
-    console.log(productBrands, dietary);
 
     if (productBrands && productBrands.length > 0) {
       query.productBrand = { $in: productBrands }; // Match product brands in the array
@@ -412,6 +410,9 @@ class ProductHelper {
     }
     if (dietary && dietary.length > 0) {
       query.dietary = { $in: dietary }; // Match all dietary values
+    }
+    if (categoryId) {
+      query.$or = [{ category: categoryId }, { subCategory: categoryId }, { parentCategory: categoryId }];
     }
 
     // Pagination calculations
