@@ -296,7 +296,9 @@ const ProductRouter = (app) => {
     "/shop-filter",
     Validate,
     tryCatch(async (req, res) => {
-      const data = await service.getCategoryFilter();
+      const { categoryId = "" } = req.query;
+
+      const data = await service.getCategoryFilter({ categoryId });
 
       return res.status(200).json({ data });
     })
@@ -311,7 +313,7 @@ const ProductRouter = (app) => {
     tryCatch(async (req, res) => {
       const { productBrands, parentCategory, dietary, categoryId, page = 1, limit = 10 } = req.body;
 
-      const data = await service.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit , categoryId});
+      const data = await service.getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit, categoryId });
 
       return res.status(200).json({ data });
     })
@@ -325,6 +327,20 @@ const ProductRouter = (app) => {
     Validate,
     tryCatch(async (req, res) => {
       const data = await service.GetLastedProduct();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.post(
+    "/getProducts",
+    Validate,
+    tryCatch(async (req, res) => {
+      const { page = 1, limit = 10, categoryId = "" } = req.query;
+
+      const { productBrands, parentCategory, dietary } = req.body;
+
+      const data = await service.getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId });
 
       return res.status(200).json({ data });
     })

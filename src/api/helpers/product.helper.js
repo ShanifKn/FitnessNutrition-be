@@ -360,42 +360,37 @@ class ProductHelper {
     return data;
   }
 
-  async getCategoryFilter() {
-    let data = {};
+  async getCategoryFilter({ categoryId }) {
+    const currentDate = new Date();
 
-    const catgory = await this.categoryRepository.GetAllTheCategoryFilter();
-
-    const dietary = await this.categoryRepository.GetDietary();
-
-    const brand = await this.repository.GetBrandName();
-
-    const brandCount = {};
-    for (const item of brand) {
-      const brandName = item.productBrand?.trim(); // Remove trailing spaces if any
-      if (brandName) {
-        brandCount[brandName] = (brandCount[brandName] || 0) + 1;
-      }
+    // Base query for categoryId
+    const query = {};
+    if (categoryId) {
+      query.$or = [{ category: categoryId }, { subCategory: categoryId }, { parentCategory: categoryId }];
     }
+    const allProducts = await this.repository.getTotalFilteredCount(currentDate, query);
 
-    // Step 2: Filter brands that occur more than three times
-    const uniqueBrands = [];
-    const seenBrands = new Set();
+    // Create arrays from all products
+    const uniqueProductBrands = [...new Set(allProducts.map((product) => product.productBrand?.trim()).filter(Boolean))].sort();
 
-    for (const item of brand) {
-      const brandName = item.productBrand?.trim();
-      if (brandName && brandCount[brandName] > 3 && !seenBrands.has(brandName)) {
-        uniqueBrands.push(item); // Add the first occurrence of the brand
-        seenBrands.add(brandName);
-      }
-    }
+    const uniqueDietaries = [...new Set(allProducts.flatMap((product) => product.dietary || []).filter(Boolean))].sort();
 
-    data = {
-      category: catgory,
-      dietary: dietary,
-      brand: uniqueBrands,
+    const uniqueParentCategories = [
+      ...new Map(
+        allProducts
+          .filter((product) => product.parentCategory) // Filter out null or undefined parentCategory
+          .map((product) => [
+            product.parentCategory._id, // Use _id as the key for uniqueness
+            { _id: product.parentCategory._id, title: product.parentCategory.title },
+          ])
+      ).values(),
+    ].sort((a, b) => a.title.localeCompare(b.title));
+
+    return {
+      productBrands: uniqueProductBrands,
+      dietaries: uniqueDietaries,
+      parentCategory: uniqueParentCategories,
     };
-
-    return data;
   }
 
   async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
@@ -443,6 +438,53 @@ class ProductHelper {
     const currentDate = new Date();
 
     return await this.repository.GetLastedProduct({ currentDate });
+  }
+
+  async getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
+
+
+    const currentDate = new Date();
+    const query = {};
+
+    if (productBrands && productBrands.length > 0) {
+      query.productBrand = { $in: productBrands }; // Match product brands in the array
+    }
+    if (parentCategory && parentCategory.length > 0) {
+      query.parentCategory = { $in: parentCategory }; // Match parentCategory in the array
+    }
+    if (dietary && dietary.length > 0) {
+      query.dietary = { $in: dietary }; // Match all dietary values
+    }
+    if (categoryId) {
+      query.$or = [{ category: categoryId }, { subCategory: categoryId }, { parentCategory: categoryId }];
+    }
+
+    // Pagination calculations
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+    const skip = (pageInt - 1) * limitInt;
+
+    const totalProducts = await this.repository.getProductCount(currentDate, query);
+
+    console.log(skip, limitInt);
+
+    const products = await this.repository.GetCategoryFilterProducts({ query, skip, limitInt, currentDate });
+
+    console.log(products.length);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalProducts / limitInt);
+
+    // Response
+    const data = {
+      products,
+      totalProducts,
+      totalPages,
+      currentPage: pageInt,
+      pageSize: limitInt,
+    };
+
+    return data;
   }
 }
 

@@ -199,9 +199,50 @@ class ProductRepository {
     })
       .skip(skip) // Skip the first 'skip' number of products
       .limit(limitInt) // Limit to the specified number of products
-      .select("_id name rate rating maxDiscount images") // Select specific fields to return
+      .select("_id name rate rating maxDiscount images dietary productBrand ") // Select specific fields to return
       .populate("parentCategory", " title ")
       .exec();
+  }
+
+  async getAllProducts(currentDate, query) {
+    const [metadata] = await Product.aggregate([
+      {
+        $match: {
+          ...query,
+          pending: false,
+          publishDate: { $lt: currentDate },
+        },
+      },
+      {
+        $facet: {
+          // Get unique product brands
+          productBrands: [{ $match: { productBrand: { $exists: true, $ne: null } } }, { $group: { _id: { $trim: { input: "$productBrand" } } } }, { $match: { _id: { $ne: "" } } }, { $project: { _id: 0, brand: "$_id" } }],
+          // Get unique dietary restrictions
+          dietaries: [{ $unwind: "$dietary" }, { $match: { dietary: { $exists: true, $ne: null } } }, { $group: { _id: "$dietary" } }, { $project: { _id: 0, dietary: "$_id" } }],
+          // Get unique parent categories
+          parentCategories: [
+            {
+              $lookup: {
+                from: "categories", // Adjust based on your actual collection name
+                localField: "parentCategory",
+                foreignField: "_id",
+                as: "parentCat",
+              },
+            },
+            { $unwind: "$parentCat" },
+            { $group: { _id: "$parentCat.title" } },
+            { $match: { _id: { $exists: true, $ne: null } } },
+            { $project: { _id: 0, category: "$_id" } },
+          ],
+        },
+      },
+    ]);
+
+    return {
+      productBrand: metadata.productBrands.map((item) => item.brand),
+      dietaries: metadata.dietaries.map((item) => item.dietary),
+      parentCategorie: metadata.parentCategories.map((item) => item.category),
+    };
   }
 
   async ProductDetails(productId) {
@@ -233,6 +274,13 @@ class ProductRepository {
       .sort({ createdAt: -1 })
       .limit(5)
       .select("_id name rate rating maxDiscount images"); // Select specific fields to return
+  }
+
+  async getTotalFilteredCount(currentDate, query) {
+    return await Product.find({ ...query, pending: false, publishDate: { $lt: currentDate } })
+      .populate("parentCategory")
+      .select("productBrand dietary parentCategory")
+      .lean();
   }
 }
 

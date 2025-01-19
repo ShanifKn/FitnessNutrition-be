@@ -195,8 +195,8 @@ class ProductService {
     return await this.helper.getProductWithLimit({ pageInt, limitInt, skip, categoryId });
   }
 
-  async getCategoryFilter() {
-    return await this.helper.getCategoryFilter();
+  async getCategoryFilter({ categoryId }) {
+    return await this.helper.getCategoryFilter({ categoryId });
   }
 
   async getCategoryFilterProduct({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
@@ -205,6 +205,11 @@ class ProductService {
 
   async GetLastedProduct() {
     return await this.helper.GetLastedProduct();
+  }
+
+  async getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
+
+    return await this.helper.getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId });
   }
 }
 
