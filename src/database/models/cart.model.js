@@ -28,6 +28,7 @@ const cartSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+
       },
     ],
     totalQuantity: {

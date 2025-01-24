@@ -199,7 +199,7 @@ class ProductRepository {
     })
       .skip(skip) // Skip the first 'skip' number of products
       .limit(limitInt) // Limit to the specified number of products
-      .select("_id name rate rating maxDiscount images dietary productBrand ") // Select specific fields to return
+      .select("_id name rate rating maxDiscount images stock_on_hand  dietary productBrand ") // Select specific fields to return
       .populate("parentCategory", " title ")
       .exec();
   }
@@ -246,7 +246,7 @@ class ProductRepository {
   }
 
   async ProductDetails(productId) {
-    return await Product.findOne({ _id: productId }).select(" rate ");
+    return await Product.findOne({ _id: productId }).select(" rate rating images ");
   }
 
   async GetBrandName() {
@@ -261,7 +261,7 @@ class ProductRepository {
     })
       .skip(skip)
       .limit(limitInt)
-      .select("_id name rate rating maxDiscount images") // Select specific fields to return
+      .select("_id name rate rating maxDiscount images stock_on_hand ") // Select specific fields to return
       .populate("parentCategory", " title ")
       .exec();
   }
@@ -273,7 +273,7 @@ class ProductRepository {
     })
       .sort({ createdAt: -1 })
       .limit(5)
-      .select("_id name rate rating maxDiscount images"); // Select specific fields to return
+      .select("_id name rate rating maxDiscount images stock_on_hand "); // Select specific fields to return
   }
 
   async getTotalFilteredCount(currentDate, query) {

@@ -21,6 +21,10 @@ class CartService {
     }
   }
 
+  async DeleteCartItem({ user, productId }) {
+    return await this.helper.DeleteCartItem({ user, productId });
+  }
+
   async GetCarts({ _id }) {
     return await this.helper.GetCarts({ _id });
   }

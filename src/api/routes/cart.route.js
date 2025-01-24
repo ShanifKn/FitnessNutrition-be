@@ -33,8 +33,22 @@ const CartRouter = (app) => {
 
       const { productId, quantity } = req.body;
 
-
       const data = await service.UpdateCart({ user, productId, quantity });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.delete(
+    "/cart/:productId",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const user = req.user._id;
+
+      const { productId } = req.params;
+
+      const data = await service.DeleteCartItem({ user, productId });
 
       return res.status(200).json({ data });
     })

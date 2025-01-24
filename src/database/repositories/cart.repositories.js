@@ -12,6 +12,7 @@ class CartRepository {
   }
 
   async UpdateCart({ user, productId, quantity }) {
+
     const cart = await Cart.findOne({ user });
 
     const item = cart.items.find((item) => item.product.toString() === productId);
@@ -31,7 +32,7 @@ class CartRepository {
   async GetCarts({ _id }) {
     return await Cart.findOne({ user: _id }).select(" -user  -__v").populate({
       path: "items.product", // Specify the field to populate
-      select: "_id name rate value rating stock_on_hand images", // Fields to include in the populated data
+      select: "_id name rate value rating stock_on_hand images quantity total ", // Fields to include in the populated data
     });
   }
 
@@ -96,6 +97,10 @@ class CartRepository {
     cart.totalPrice = cart.items.reduce((acc, item) => acc + item.total, 0);
 
     // Save the updated cart
+    return await cart.save();
+  }
+
+  async DeleteCartItem({ cart }) {
     return await cart.save();
   }
 }

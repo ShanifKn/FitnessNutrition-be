@@ -21,6 +21,8 @@ class CartHelper {
       quantity: quantity,
       price: product.rate,
       total,
+      rating: product.rating,
+      images: product.images[0],
     });
 
     return cartItems;
@@ -30,8 +32,8 @@ class CartHelper {
     return await this.repository.CreateCart({ user, fetchProduct });
   }
 
-  async UpdateCart({ user, productId, quantity  }) {
-    return await this.repository.UpdateCart({ user, productId, quantity  });
+  async UpdateCart({ user, productId, quantity }) {
+    return await this.repository.UpdateCart({ user, productId, quantity });
   }
 
   async GetCarts({ _id }) {
@@ -68,6 +70,16 @@ class CartHelper {
 
   async UpdateUserCart({ user, fetchProduct }) {
     return await this.repository.UpdateUserCart({ user, fetchProduct });
+  }
+
+  async DeleteCartItem({ user, productId }) {
+    const cart = await this.repository.GetUserCart({ user });
+
+    const itemIndex = cart.items.findIndex((item) => item._id.toString() === productId);
+
+    const removedItem = cart.items.splice(itemIndex, 1)[0];
+
+    return await this.repository.DeleteCartItem({ cart });
   }
 }
 

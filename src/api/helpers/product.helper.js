@@ -466,11 +466,7 @@ class ProductHelper {
 
     const totalProducts = await this.repository.getProductCount(currentDate, query);
 
-    console.log(skip, limitInt);
-
     const products = await this.repository.GetCategoryFilterProducts({ query, skip, limitInt, currentDate });
-
-    console.log(products.length);
 
     // Calculate total pages
     const totalPages = Math.ceil(totalProducts / limitInt);

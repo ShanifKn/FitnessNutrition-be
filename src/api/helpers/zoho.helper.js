@@ -1,6 +1,6 @@
 import ZohoRepository from "../../database/repositories/zoho.repositories.js";
 import fetch from "node-fetch";
-import AppError from "../../utils/appError.js";
+import { AppError, tryCatch } from "../../utils/index.js";
 import { ZOHO_API_ERROR } from "../constants/errorCodes.js";
 import { PAGE_LENGTH, ZOHO_GENERATE_TOKEN, ZOHO_ORGANIZATION, ZOHO_PRODUCT_URL } from "../../config/index.js";
 import { Product } from "../../database/models/product.model.js";
@@ -257,7 +257,6 @@ class ZohoHelper {
       });
 
       if (!response.ok) {
-
         throw new AppError(ZOHO_API_ERROR, "User already registered. Please log in.", 400);
       }
 
@@ -265,8 +264,35 @@ class ZohoHelper {
 
       return data;
     } catch (e) {
-
       throw new AppError(ZOHO_API_ERROR, "User already registered. Please log in.", 400);
+    }
+  }
+
+  async CreateSalesOrder({ zohoPayload, access_token }) {
+    const url = `https://www.zohoapis.com/books/v3/salesorders?organization_id=${ZOHO_ORGANIZATION}`;
+
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Zoho-oauthtoken ${access_token}`, // Use your actual Zoho auth token
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(zohoPayload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new AppError(ZOHO_API_ERROR, "Please try again after sometimes.", 400);
+      }
+
+      return data;
+    } catch (e) {
+
+
+      throw new AppError(ZOHO_API_ERROR, "Please try again after sometimes.", 400);
     }
   }
 }

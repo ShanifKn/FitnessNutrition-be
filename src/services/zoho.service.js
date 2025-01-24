@@ -46,6 +46,20 @@ class ZohoService {
 
     return await this.helper.CreateCustomer({ email, name, phone, access_token });
   }
+
+  async CreateSalesOrder({ zohoPayload }) {
+    const token = await this.helper.GetToken();
+
+    if (!token) throw new AppError(ZOHO_API_ERROR, "Generate Zoho access token", 400);
+
+    const { client_id, client_secret, refresh_token } = token;
+
+    const { access_token } = await this.helper.ReGenerateCode({ client_id, client_secret, refresh_token });
+
+    const salesOrder = await this.helper.CreateSalesOrder({ zohoPayload, access_token });
+
+    return { created: true, salesOrder: salesOrder.salesorder };
+  }
 }
 
 export default ZohoService;

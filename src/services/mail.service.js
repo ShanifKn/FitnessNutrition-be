@@ -98,6 +98,41 @@ class MailService {
       throw new AppError(ERROR_SENDING_OTP, "Error sending SMS", 400);
     }
   }
+
+  async sendOrderPlacedMail(email, orderDetails) {
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <h2 style="color: #4CAF50;">Order Confirmation</h2>
+        <p>Dear Customer,</p>
+        <p>Thank you for shopping with us! Your order has been placed successfully. Below are the details of your order:</p>
+        <div style="border: 1px solid #ddd; padding: 10px; margin: 20px 0; background: #f9f9f9;">
+          <h3 style="color: #333;">Order Summary</h3>
+          <p><strong>Order Number:</strong> ${orderDetails.orderNumber}</p>
+          <p><strong>Order Date:</strong> ${orderDetails.orderDate}</p>
+          <p><strong>Total Amount:</strong> AED ${orderDetails.totalAmount}</p>
+        </div>
+        <p>Your order is currently <strong>pending confirmation</strong>. Once it is confirmed, we will notify you via email.</p>
+        <p>Feel free to reach out to us if you have any questions regarding your order.</p>
+        <p>Thank you for choosing Fit & Muscles!</p>
+        <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;">
+        <footer style="font-size: 12px; color: #888;">
+          <p>This is an automated email, please do not reply.</p>
+          <p>&copy; 2024 Fit & Muscles. All rights reserved.</p>
+        </footer>
+      </div>
+    `;
+
+    // Send the email
+    const info = await transporter.sendMail({
+      from: `${EMAIL_USER_ID}`, // Sender address
+      to: email, // Recipient address
+      subject: "Your Order Has Been Placed!", // Subject line
+      text: `Your order is currently pending confirmation. We will notify you once it has been confirmed.`, // Plain text body
+      html: htmlContent, // HTML body
+    });
+
+    console.log("Message sent: %s", info.messageId);
+  }
 }
 
 export default MailService;
