@@ -26,6 +26,8 @@ const orderSchema = new mongoose.Schema(
 
     payment: { type: Boolean, default: false },
 
+    reFund: { type: Boolean, default: false },
+
     shippingAddress: {},
 
     discountCoupon: { type: String },

@@ -53,6 +53,56 @@ const OrdersRouter = (app) => {
       return res.status(200).json({ message, pending });
     })
   );
+
+  app.get(
+    "/orders-count",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const data = await service.GetOrdersCount();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.get(
+    "/get-orders",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { page = 1, limit = 10 } = req.query;
+
+      const data = await service.GetOrders({ page, limit });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.get(
+    "/get-returnOrders",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { page = 1, limit = 10 } = req.query;
+
+      const data = await service.GetReturnOrders({ page, limit });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.get(
+    "/order/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id } = req.params;
+
+      const data = await service.GetOrdersDetails({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
 };
 
 export default OrdersRouter;

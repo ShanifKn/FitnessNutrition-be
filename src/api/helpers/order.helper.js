@@ -75,6 +75,35 @@ class OrderHelper {
 
     if (created) this.mail.sendOrderPlacedMail(user.email, orderDetails);
   }
+
+  async GetOrdersCount() {
+    // Example usage
+    const pendingOrders = await this.repository.GetOrdersCount("pending");
+    const cancelledOrders = await this.repository.GetOrdersCount("cancelled");
+    const deliveredOrders = await this.repository.GetOrdersCount("delivered");
+    const totalOrders = await this.repository.GetOrdersCounts();
+
+    const data = {
+      pendingOrders,
+      cancelledOrders,
+      deliveredOrders,
+      totalOrders,
+    };
+
+    return data;
+  }
+
+  async GetOrders({ pageInt, limitInt, skip }) {
+    return await this.repository.GetOrders({ pageInt, limitInt, skip });
+  }
+
+  async GetReturnOrders({ pageInt, limitInt, skip }) {
+    return await this.repository.GetReturnOrders({ pageInt, limitInt, skip });
+  }
+
+  async GetOrdersDetails({ _id }) {
+    return await this.repository.GetOrdersDetails({ _id });
+  }
 }
 
 export default OrderHelper;

@@ -37,6 +37,33 @@ class OrderRepository {
   async deletCartByUser(_id) {
     return await Cart.deleteOne({ user: _id });
   }
+
+  async GetOrdersCount({ status }) {
+    return await Orders.countDocuments({
+      orderComfirmed: status,
+    });
+  }
+
+  async GetOrdersCounts() {
+    return await Orders.countDocuments();
+  }
+
+  async GetOrders({ pageInt, limitInt, skip }) {
+    return await Orders.find().skip(skip).limit(limitInt).exec();
+  }
+
+  async GetReturnOrders({ pageInt, limitInt, skip }) {
+    return await Orders.find({
+      orderComfirmed: "return pending",
+    })
+      .skip(skip)
+      .limit(limitInt)
+      .exec();
+  }
+
+  async GetOrdersDetails({ _id }) {
+    return await Orders.findOne({ _id });
+  }
 }
 
 export default OrderRepository;
