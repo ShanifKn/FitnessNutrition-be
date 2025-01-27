@@ -2,6 +2,7 @@ import { Product } from "../models/product.model.js";
 import { ProductVariant } from "../models/variantProduct.model.js";
 
 class ProductRepository {
+  
   async FindProductById({ item_id }) {
     return await Product.findOne({ item_id });
   }

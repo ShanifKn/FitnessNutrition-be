@@ -102,7 +102,17 @@ class OrderHelper {
   }
 
   async GetOrdersDetails({ _id }) {
-    return await this.repository.GetOrdersDetails({ _id });
+    let user = await this.repository.GetOrdersDetails({ _id });
+
+    const total = await this.repository.GetUserOrderCount(user.user);
+
+    // Convert the user document to a plain object (if it's not already)
+    user = user.toObject ? user.toObject() : user;
+
+    // Add the totalOrder key
+    user.totalOrder = total;
+
+    return user;
   }
 }
 

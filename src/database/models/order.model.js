@@ -19,6 +19,7 @@ const orderSchema = new mongoose.Schema(
         stock: { type: Number, required: true },
         image: { type: String },
         name: { type: String },
+        status: { type: String, default: "pending" },
       },
     ],
 
@@ -40,7 +41,7 @@ const orderSchema = new mongoose.Schema(
 
     salesorderId: { type: String },
 
-    orderNumber: { type: String, unique: true }, // New field for the random order number
+    orderNumber: { type: String, unique: true },
   },
   { timestamps: true }
 );

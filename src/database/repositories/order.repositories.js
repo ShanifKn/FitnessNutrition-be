@@ -62,8 +62,21 @@ class OrderRepository {
   }
 
   async GetOrdersDetails({ _id }) {
-    return await Orders.findOne({ _id });
+    return await Orders.findOne({ _id })
+      .populate({
+        path: "user",
+        select: "name email phone image", // Include only these fields from the user document
+      })
+      .populate({
+        path: "product.productId", // Populate productId within the product array
+      });
   }
+
+  async GetUserOrderCount(_id) {
+    return await Orders.countDocuments({ user: _id });
+  }
+
+  async GetUserOrderCount() {}
 }
 
 export default OrderRepository;
