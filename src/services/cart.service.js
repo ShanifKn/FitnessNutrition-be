@@ -46,6 +46,10 @@ class CartService {
 
     return { message: "Product Removed from Wishlist" };
   }
+
+  async GetCartCount({ _id }) {
+    return await this.helper.GetCartCount({ _id });
+  }
 }
 
 export default CartService;

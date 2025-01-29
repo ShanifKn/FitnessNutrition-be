@@ -12,7 +12,6 @@ class CartRepository {
   }
 
   async UpdateCart({ user, productId, quantity }) {
-
     const cart = await Cart.findOne({ user });
 
     const item = cart.items.find((item) => item.product.toString() === productId);
@@ -102,6 +101,10 @@ class CartRepository {
 
   async DeleteCartItem({ cart }) {
     return await cart.save();
+  }
+
+  async GetCartCount({ _id }) {
+    return await Cart.findOne({ user: _id });
   }
 }
 

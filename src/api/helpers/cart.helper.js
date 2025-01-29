@@ -81,6 +81,13 @@ class CartHelper {
 
     return await this.repository.DeleteCartItem({ cart });
   }
+
+  async GetCartCount({ _id }) {
+
+    const cart = await this.repository.GetCartCount({ _id });
+
+    return cart.totalQuantity;
+  }
 }
 
 export default CartHelper;

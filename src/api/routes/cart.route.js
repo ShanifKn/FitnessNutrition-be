@@ -68,6 +68,19 @@ const CartRouter = (app) => {
   );
 
   app.get(
+    "/cart-count",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id } = req.user;
+
+      const data = await service.GetCartCount({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.get(
     "/wishlist",
     Authentication,
     Validate,
