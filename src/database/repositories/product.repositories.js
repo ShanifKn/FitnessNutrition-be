@@ -2,7 +2,6 @@ import { Product } from "../models/product.model.js";
 import { ProductVariant } from "../models/variantProduct.model.js";
 
 class ProductRepository {
-  
   async FindProductById({ item_id }) {
     return await Product.findOne({ item_id });
   }
@@ -162,8 +161,10 @@ class ProductRepository {
     return await Product.find().select("_id item_id actual_available_stock name rate status image size colour flavour ");
   }
 
-  async GetProducts() {
-    return await Product.find({ pending: false }).populate("category", "name");
+  async GetProducts({ currentDate }) {
+    return await Product.find({ pending: false, publishDate: { $lt: currentDate } })
+      .populate("category", "name")
+      .limit(15);
   }
 
   async GetPendingCounts() {
@@ -273,7 +274,7 @@ class ProductRepository {
       publishDate: { $lt: currentDate },
     })
       .sort({ createdAt: -1 })
-      .limit(5)
+      .limit(15)
       .select("_id name rate rating maxDiscount images stock_on_hand "); // Select specific fields to return
   }
 
@@ -282,6 +283,10 @@ class ProductRepository {
       .populate("parentCategory")
       .select("productBrand dietary parentCategory")
       .lean();
+  }
+
+  async ProductSearch(filter) {
+    return await Product.find(filter).limit(5);
   }
 }
 

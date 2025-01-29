@@ -207,9 +207,16 @@ class ProductService {
     return await this.helper.GetLastedProduct();
   }
 
-  async getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
+  async GetProductBestSellers() {
+    return await this.helper.GetProductBestSellers();
+  }
 
+  async getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
     return await this.helper.getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId });
+  }
+
+  async ProductSearch({ query }) {
+    return await this.helper.ProductSearch({ query });
   }
 }
 

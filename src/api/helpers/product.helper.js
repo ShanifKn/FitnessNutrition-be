@@ -298,7 +298,9 @@ class ProductHelper {
   }
 
   async GetProductToType() {
-    const product = await this.repository.GetProducts();
+    const currentDate = new Date();
+
+    const product = await this.repository.GetProducts({ currentDate });
 
     const groupedProducts = product.reduce((result, product) => {
       // Assuming `analytics` is an array of strings
@@ -440,9 +442,34 @@ class ProductHelper {
     return await this.repository.GetLastedProduct({ currentDate });
   }
 
+  async GetProductBestSellers() {
+    const currentDate = new Date();
+
+    const product = await this.repository.GetProducts({ currentDate });
+
+    const lastedProdt = await this.repository.GetLastedProduct({ currentDate });
+
+    const groupedProducts = product.reduce((result, product) => {
+      // Assuming `analytics` is an array of strings
+      product.analytics.forEach((analytic) => {
+        if (!result[analytic]) {
+          result[analytic] = [];
+        }
+        result[analytic].push(product);
+      });
+      return result;
+    }, {});
+
+    const data = {
+      newly: lastedProdt,
+      featured: groupedProducts.RM,
+      popular: groupedProducts.LDN,
+    };
+
+    return data;
+  }
+
   async getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId }) {
-
-
     const currentDate = new Date();
     const query = {};
 
@@ -481,6 +508,25 @@ class ProductHelper {
     };
 
     return data;
+  }
+
+  async ProductSearch({ query }) {
+    let filter = {};
+
+    if (query) {
+      filter = {
+        $or: [
+          { name: { $regex: query, $options: "i" } },
+          { productBrand: { $regex: query, $options: "i" } },
+          { flavour: { $regex: query, $options: "i" } },
+          { colour: { $regex: query, $options: "i" } },
+          { chips: { $elemMatch: { $regex: query, $options: "i" } } }, // Partial match in chips array
+          { dietary: { $elemMatch: { $regex: query, $options: "i" } } }, // Partial match in dietary array
+        ],
+      };
+    }
+
+    return await this.repository.ProductSearch(filter);
   }
 }
 

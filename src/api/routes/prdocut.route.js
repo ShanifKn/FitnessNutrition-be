@@ -229,6 +229,19 @@ const ProductRouter = (app) => {
   );
 
   // @route GET /
+  // @des get product by category
+  // @access private
+  app.get(
+    "/product-best",
+    Validate,
+    tryCatch(async (req, res) => {
+      const data = await service.GetProductBestSellers();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route GET /
   // @des get product details
   // @access private
   app.get(
@@ -341,6 +354,21 @@ const ProductRouter = (app) => {
       const { productBrands, parentCategory, dietary } = req.body;
 
       const data = await service.getProductsWithFilter({ productBrands, parentCategory, dietary, page, limit, categoryId });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  // @route GET /
+  // @des get product details
+  // @access private
+  app.get(
+    "/products/search",
+    Validate,
+    tryCatch(async (req, res) => {
+      const { query } = req.query;
+
+      const data = await service.ProductSearch({ query });
 
       return res.status(200).json({ data });
     })
