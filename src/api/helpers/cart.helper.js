@@ -83,8 +83,9 @@ class CartHelper {
   }
 
   async GetCartCount({ _id }) {
-
     const cart = await this.repository.GetCartCount({ _id });
+
+    if (!cart) return 0;
 
     return cart.totalQuantity;
   }

@@ -45,7 +45,8 @@ const UserRouter = (app) => {
     tryCatch(async (req, res) => {
       const { _id, email, name, password, image, phone, DOB, gender } = req.body;
 
-      const user = await userExists.ForCustomerSignup({ email });
+      const user = await userExists.ForCustomerSignup({ email, phone });
+
 
       let data;
 

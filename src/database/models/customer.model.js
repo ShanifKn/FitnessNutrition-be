@@ -7,7 +7,7 @@ const customerSchema = new mongoose.Schema(
     customerId: { type: String },
     password: { type: String },
     image: { type: String },
-    phone: { type: Number, unique: true },
+    phone: { type: Number },
     dob: { type: Date },
     gender: { type: String },
     verfiy: { type: Boolean, default: false },

@@ -26,8 +26,18 @@ class ExistCheck {
     if (userCount > 0) throw new AppError(USER_ALREADY_EXISTS, "User already exists with this Email ID. Please login", 400);
   }
 
-  async ForCustomerSignup({ email }) {
-    const userCount = await this.userRep.CountCustomerByEmail({ email });
+  async ForCustomerSignup({ email, phone }) {
+    let userCount;
+
+    if (email) {
+     userCount = await this.userRep.CountCustomerByEmail({ email });
+
+    }
+
+    if (phone) {
+     userCount = await this.userRep.CountCustomerByPhone({ phone });
+
+    }
 
     if (userCount > 0) return true;
   }
@@ -41,8 +51,6 @@ class ExistCheck {
   async ForCustomerVerfication({ email, phone }) {
     if (phone) {
       const userCount = await this.userRep.CountCustomerByPhone({ phone });
-
-      console.log(userCount)
 
       if (userCount < 1) throw new AppError(USER_NOT_FOUND, "No user found with this phone number.", 400);
     } else {

@@ -71,7 +71,7 @@ class UserService {
     // if (user && phone) await this.userHelper.SendOtpPhone({ user });
 
     //
-    return { message: `Otp send successfully OTP` };
+    return { message: `OTP has been sent successfully to your registered email.` };
   }
 
   async CustomerVerfication({ email, phone, otp }) {
