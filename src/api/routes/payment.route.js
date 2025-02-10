@@ -103,6 +103,34 @@ const OrdersRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+  app.get(
+    "/orderStatus/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id } = req.params;
+
+      const data = await service.GetOrdersStatus({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.post(
+    "/order-update",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id, orderComfirmed, invoiceId, product, remark } = req.body;
+
+      const data = await service.UpdateOrder({ _id, orderComfirmed, invoiceId, product, remark });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
 };
 
 export default OrdersRouter;

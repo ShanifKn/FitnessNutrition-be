@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema(
         stock: { type: Number, required: true },
         image: { type: String },
         name: { type: String },
-        status: { type: String, default: "pending" },
+        status: { type: String, default: "pending", enum: ["pending", "cancelled", "return", "delivered", "confirmed"] },
       },
     ],
 
@@ -35,13 +35,17 @@ const orderSchema = new mongoose.Schema(
 
     discountAmount: { type: Number },
 
-    orderComfirmed: { type: String, default: "pending" },
+    orderComfirmed: { type: String, default: "pending", enum: ["pending", "cancelled", "return", "delivered", "confirmed"] },
 
     total: { type: Number, required: true },
 
     salesorderId: { type: String },
 
     orderNumber: { type: String, unique: true },
+
+    invoiceId: { type: String },
+
+    remark: { type: String },
   },
   { timestamps: true }
 );

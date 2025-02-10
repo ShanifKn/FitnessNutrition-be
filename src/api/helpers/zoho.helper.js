@@ -271,6 +271,9 @@ class ZohoHelper {
   async CreateSalesOrder({ zohoPayload, access_token }) {
     const url = `https://www.zohoapis.com/books/v3/salesorders?organization_id=${ZOHO_ORGANIZATION}`;
 
+    // console.log("zohoPayload", zohoPayload);
+
+    // console.log(access_token);
 
     try {
       const response = await fetch(url, {
@@ -284,14 +287,13 @@ class ZohoHelper {
 
       const data = await response.json();
 
+
       if (!response.ok) {
         throw new AppError(ZOHO_API_ERROR, "Please try again after sometimes.", 400);
       }
 
       return data;
     } catch (e) {
-
-
       throw new AppError(ZOHO_API_ERROR, "Please try again after sometimes.", 400);
     }
   }

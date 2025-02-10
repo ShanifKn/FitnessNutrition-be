@@ -61,6 +61,7 @@ class OrderHelper {
       notes: "Order created via integration",
     };
 
+
     const { created, salesOrder } = await this.zohoService.CreateSalesOrder({ zohoPayload });
 
     if (created) await this.repository.UpdateSalesOrderId(_id, salesOrder.salesorder_id);
@@ -113,6 +114,64 @@ class OrderHelper {
     user.totalOrder = total;
 
     return user;
+  }
+
+  async UpdateOrder({ _id, orderComfirmed, invoiceId, product, remark }) {
+    let orderTimeline;
+
+    const data = await this.repository.UpdateOrder({ _id, orderComfirmed, invoiceId, product, remark });
+
+    if (orderComfirmed === "confirmed") {
+      orderTimeline = await this.OrderTracking({ _id });
+
+      await this.sendConfirmationEmail({ _id });
+    }
+
+    if (orderComfirmed === "delivered") {
+    }
+
+    const datas = {
+      data,
+      orderTimeline,
+    };
+
+    return datas;
+  }
+
+  async sendConfirmationEmail({ _id }) {
+    const data = await this.repository.GetOrdersDetails({ _id });
+
+    const { user, invoiceId, orderNumber, total } = data;
+
+    const orderDetails = {
+      orderNumber,
+      orderDate: new Date().toISOString().split("T")[0],
+      totalAmount: total,
+      invoiceId,
+    };
+
+    return this.mail.sendOrderConfirmationMail(user.email, orderDetails);
+  }
+
+  async OrderTracking({ _id }) {
+    const data = {
+      orderId: _id,
+      orderTimeline: [
+        { status: "Order Confirmed", date: new Date(), time: new Date().toLocaleTimeString(), completed: true },
+        { status: "Pending", date: "", time: "" },
+        { status: "Pending", date: "", time: "" },
+        { status: "Pending", date: "", time: "" },
+      ],
+    };
+
+    return await this.repository.AddOrderTimeline(data);
+  }
+
+  
+
+
+  async GetOrdersStatus({ _id }) {
+    return this.repository.GetOrdersStatus({ _id });
   }
 }
 

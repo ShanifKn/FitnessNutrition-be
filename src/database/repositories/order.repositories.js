@@ -1,5 +1,6 @@
 import { Cart } from "../models/cart.model.js";
 import { Orders } from "../models/order.model.js";
+import { OrderStatus } from "../models/orderStatus.model.js";
 
 class OrderRepository {
   async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total }) {
@@ -76,7 +77,16 @@ class OrderRepository {
     return await Orders.countDocuments({ user: _id });
   }
 
-  async GetUserOrderCount() {}
+  async UpdateOrder({ _id, orderComfirmed, invoiceId, product, remark }) {
+    return await Orders.findByIdAndUpdate({ _id }, { $set: { orderComfirmed, invoiceId, product, remark } }, { new: true, runValidators: true });
+  }
+  async AddOrderTimeline(data) {
+    return await OrderStatus.create(data);
+  }
+
+  async GetOrdersStatus({ _id }) {
+    return await OrderStatus.findOne({ orderId: _id });
+  }
 }
 
 export default OrderRepository;

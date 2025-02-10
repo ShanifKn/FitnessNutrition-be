@@ -36,6 +36,14 @@ class OrderService {
   async GetOrdersDetails({ _id }) {
     return await this.helpers.GetOrdersDetails({ _id });
   }
+
+  async UpdateOrder({ _id, orderComfirmed, invoiceId, product, remark }) {
+    return await this.helpers.UpdateOrder({ _id, orderComfirmed, invoiceId, product, remark });
+  }
+
+  async GetOrdersStatus({ _id }) {
+    return await this.helpers.GetOrdersStatus({ _id });
+  }
 }
 
 export default OrderService;

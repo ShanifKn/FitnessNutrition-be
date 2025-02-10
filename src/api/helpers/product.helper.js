@@ -12,7 +12,7 @@ class ProductHelper {
   }
 
   async GetProducts() {
-    return await this.repository.GetProducts();
+    return await this.repository.GetProductForAdmin();
   }
 
   async GetPendingCounts() {
@@ -528,6 +528,9 @@ class ProductHelper {
 
     return await this.repository.ProductSearch(filter);
   }
+
+
+
 }
 
 export default ProductHelper;

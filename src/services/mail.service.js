@@ -133,6 +133,42 @@ class MailService {
 
     console.log("Message sent: %s", info.messageId);
   }
+
+  async sendOrderConfirmationMail(email, orderDetails) {
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <h2 style="color: #4CAF50;">Order Confirmed 🎉</h2>
+        <p>Dear Customer,</p>
+        <p>We are excited to inform you that your order has been confirmed! Below are the details of your order:</p>
+        <div style="border: 1px solid #ddd; padding: 10px; margin: 20px 0; background: #f9f9f9;">
+          <h3 style="color: #333;">Order Summary</h3>
+          <p><strong>Order Number:</strong> ${orderDetails.orderNumber}</p>
+          <p><strong>Order Date:</strong> ${orderDetails.orderDate}</p>
+          <p><strong>Total Amount:</strong> AED ${orderDetails.totalAmount}</p>
+          <p><strong>Invoice Number:</strong> ${orderDetails.invoiceNo}</p>
+        </div>
+        <p>Your order is now being processed and will be dispatched soon. We will provide tracking details once your order is shipped.</p>
+        <p>Thank you for shopping with us! If you have any questions, feel free to contact our support team.</p>
+        <p>We appreciate your trust in Fit & Muscles! 💪</p>
+        <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;">
+        <footer style="font-size: 12px; color: #888;">
+          <p>This is an automated email, please do not reply.</p>
+          <p>&copy; 2024 Fit & Muscles. All rights reserved.</p>
+        </footer>
+      </div>
+    `;
+
+    // Send the email
+    const info = await transporter.sendMail({
+      from: `${EMAIL_USER_ID}`, // Sender address
+      to: email, // Recipient address
+      subject: "Your Order Has Been Confirmed! ✅", // Subject line
+      text: `Your order has been confirmed. Invoice No: ${orderDetails.invoiceNo}. We will notify you once it has been shipped.`, // Plain text body
+      html: htmlContent, // HTML body
+    });
+
+    console.log("Order Confirmation Mail sent: %s", info.messageId);
+  }
 }
 
 export default MailService;

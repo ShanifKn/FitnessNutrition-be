@@ -373,6 +373,7 @@ const ProductRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
 };
 
 export default ProductRouter;

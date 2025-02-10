@@ -218,6 +218,7 @@ class ProductService {
   async ProductSearch({ query }) {
     return await this.helper.ProductSearch({ query });
   }
+
 }
 
 export default ProductService;

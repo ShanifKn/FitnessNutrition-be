@@ -154,17 +154,21 @@ class ProductRepository {
   }
 
   async GetPendingProducts() {
-    return await Product.find({ pending: true }).select("_id item_id actual_available_stock name rate status image"); // Adjust the fields you want from the category
+    return await Product.find({ pending: true }).select("_id item_id actual_available_stock name rate status images"); // Adjust the fields you want from the category
   }
 
   async GetAllProduct() {
-    return await Product.find().select("_id item_id actual_available_stock name rate status image size colour flavour ");
+    return await Product.find().select("_id item_id actual_available_stock name rate status images size colour flavour ");
   }
 
   async GetProducts({ currentDate }) {
     return await Product.find({ pending: false, publishDate: { $lt: currentDate } })
       .populate("category", "name")
       .limit(15);
+  }
+
+  async GetProductForAdmin() {
+    return await Product.find({ pending: false }).populate("category", "name").limit(15);
   }
 
   async GetPendingCounts() {
@@ -288,6 +292,7 @@ class ProductRepository {
   async ProductSearch(filter) {
     return await Product.find(filter).limit(5);
   }
+
 }
 
 export default ProductRepository;
