@@ -1,7 +1,10 @@
+import { PRIVATE_KEY_PATH, MERCHANT_ID } from "../../config/index.js";
 import OrderService from "../../services/order.service.js";
 import { tryCatch } from "../../utils/index.js";
 import Authentication from "../middlewares/authentication.js";
 import Validate from "../validations/validator.js";
+import fs from "fs";
+import crypto from "crypto";
 
 const OrdersRouter = (app) => {
   const service = new OrderService();
@@ -10,32 +13,92 @@ const OrdersRouter = (app) => {
   //@desc create a sub category
   //@access private
   app.post(
-    "/create-SubCat",
+    "/create-payby",
     Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const requestBody = {
         requestTime: Date.now(),
-        bizContent: req.body,
+        bizContent: {
+          merchantOrderNo: "M965739182419",
+          subject: "Your subject",
+          totalAmount: {
+            currency: "AED",
+            amount: 1.01,
+          },
+          paySceneCode: "PAYPAGE",
+          accessoryContent: {
+            amountDetail: {
+              vatAmount: {
+                currency: "AED",
+                amount: 20.65,
+              },
+              amount: {
+                currency: "AED",
+                amount: 1.09,
+              },
+            },
+            goodsDetail: {
+              body: "Gifts",
+              categoriesTree: "CT12",
+              goodsCategory: "GC10",
+              goodsId: "GI1005",
+              goodsName: "candy flower",
+              price: {
+                currency: "AED",
+                amount: 10.87,
+              },
+              quantity: 2,
+            },
+            terminalDetail: {
+              operatorId: "OP1000000000000001",
+              storeId: "SI100000000000002",
+              terminalId: "TI100999999999900",
+              merchantName: "candy home",
+              storeName: "lovely house",
+            },
+          },
+        },
       };
 
-      // Replace with your PayBy credentials
-      const partnerId = "200000000888";
-      const secretKey = "your-secret-key"; // Use the key provided by PayBy
+      const filePath = "./src/api/routes/Merchant_private_key.pem";
+      const privateKey = fs.readFileSync(filePath, "utf8");
 
-      // Generate the sign (adjust according to PayBy's documentation)
-      const sign = crypto.createHmac("sha256", secretKey).update(JSON.stringify(requestBody)).digest("base64");
+      // Convert requestBody to JSON string
+      const requestBodyString = JSON.stringify(requestBody);
 
-      const response = await axios.post("https://payby-api-url.com/payment", requestBody, {
+      // Create a Sign object
+      const sign = crypto.createSign("SHA256");
+
+      // Update the Sign object with the request body
+      sign.update(requestBodyString);
+      sign.end();
+
+      // Generate the signature in base64 format
+      const signature = sign.sign(privateKey, "base64");
+
+      console.log("Generated Signature:", signature);
+
+      const response = await fetch("https://uat.test2pay.com/sgs/api/acquire2/placeOrder", {
+        method: "POST",
         headers: {
           "Content-Language": "en",
           "Content-Type": "application/json",
-          sign: sign,
-          "Partner-Id": partnerId,
+          sign: signature,
+          "Partner-Id": MERCHANT_ID,
         },
+        body: requestBodyString, // Use the JSON string as the body
       });
 
-      return res.status(200).json({ iframeUrl: response.data.data.payPageUrl });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log("Response:", data);
+
+      return res.status(200).json({ iframeUrl: data.data.payPageUrl });
     })
   );
 
@@ -129,8 +192,6 @@ const OrdersRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
-
-
 };
 
 export default OrdersRouter;
