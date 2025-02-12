@@ -5,10 +5,10 @@ class PaybyService {
     this.helper = new PaybyHelper();
   }
 
-  async CreateOrder({ orderId }) {
+  async CreateOrder({ formData }) {
 
 
-    return await this.helper.CreateOrder({ orderId });
+    return await this.helper.CreateOrder({ formData });
   }
 }
 

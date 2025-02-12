@@ -11,12 +11,9 @@ const PayBy = (app) => {
     "/create-payby",
     Validate,
     tryCatch(async (req, res) => {
-      const { orderId } = req.body;
+      const formData = req.body;
 
-      const currentDate = Date.now();
-
-
-      const data = await service.CreateOrder({ orderId });
+      const data = await service.CreateOrder({ formData });
 
       return res.status(200).json({ data });
     })
