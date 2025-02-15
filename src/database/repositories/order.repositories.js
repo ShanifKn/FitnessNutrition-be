@@ -21,8 +21,8 @@ class OrderRepository {
     return await newOrder.save();
   }
 
-  async findOrderWithDetails({ user }) {
-    return await Orders.findOne({ user })
+  async findOrderWithDetails({ _id }) {
+    return await Orders.findOne({ _id })
       .populate({
         path: "user", // Populate user details
       })
@@ -86,6 +86,24 @@ class OrderRepository {
 
   async GetOrdersStatus({ _id }) {
     return await OrderStatus.findOne({ orderId: _id });
+  }
+
+  async GetUserOrders({ user }) {
+    return await Orders.find({ user: user })
+      .populate({
+        path: "product.productId",
+        select: "_id name rate images rating",
+        // Populate productId within the product array
+      })
+      .lean();
+  }
+
+  async GetUserOrderStatus({ _id }) {
+    return await OrderStatus.findOne({ orderId: _id }).lean().select('orderTimeline -_id');
+  }
+
+  async GetUserOrderDetails({ _id }) {
+    return await Orders.findOne({ _id }).lean();
   }
 }
 

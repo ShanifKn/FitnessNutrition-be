@@ -99,6 +99,32 @@ const OrdersRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+  app.get(
+    "/userOrders",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const user = req.user._id;
+
+      const data = await service.GetUserOrder({ user });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.get(
+    "/userOrders/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const _id = req.params;
+
+      const data = await service.GetUserOrderDetails({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
 };
 
 export default OrdersRouter;

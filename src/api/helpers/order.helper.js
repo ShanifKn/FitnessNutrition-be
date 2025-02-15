@@ -14,21 +14,21 @@ class OrderHelper {
 
     let pending = false;
 
-    const order = await this.repository.findOrderWithDetails({ user });
+    // const order = await this.repository.findOrderWithDetails({ user });
 
-    if (order && order.orderComfirmed === "pending") {
-      message = "Previous order is on pending. Once it is confirmed, you can place another order.";
+    // if (order && order.orderComfirmed === "pending") {
+    //   message = "Previous order is on pending. Once it is confirmed, you can place another order.";
 
-      pending = true;
-    } else {
-      await this.repository.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total });
+    //   pending = true;
+    // } else {
+    const { _id } = await this.repository.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total });
 
-      const order = await this.repository.findOrderWithDetails({ user });
+    const order = await this.repository.findOrderWithDetails({ _id });
 
-      message = "Order Placed successfully";
+    message = "Order Placed successfully";
 
-      await this.CreateZohoSalesOrder(order);
-    }
+    await this.CreateZohoSalesOrder(order);
+    // }
 
     return { message, pending };
   }
@@ -60,7 +60,6 @@ class OrderHelper {
       line_items: lineItems,
       notes: "Order created via integration",
     };
-
 
     const { created, salesOrder } = await this.zohoService.CreateSalesOrder({ zohoPayload });
 
@@ -167,11 +166,35 @@ class OrderHelper {
     return await this.repository.AddOrderTimeline(data);
   }
 
-  
-
-
   async GetOrdersStatus({ _id }) {
-    return this.repository.GetOrdersStatus({ _id });
+    return await this.repository.GetOrdersStatus({ _id });
+  }
+
+  async GetUserOrder({ user }) {
+    const orders = await this.repository.GetUserOrders({ user });
+
+    if (!orders || orders.length === 0) return [];
+
+    // Fetch status for each order
+    const ordersWithStatus = await Promise.all(
+      orders.map(async (order) => {
+        const status = await this.repository.GetUserOrderStatus({ _id: order._id });
+
+        return { ...order, status };
+      })
+    );
+
+    return ordersWithStatus;
+  }
+
+  async GetUserOrderDetails({ _id }) {
+    const order = await this.repository.GetUserOrderDetails({ _id });
+
+    if (!order) return null;
+
+    const status = await this.repository.GetUserOrderStatus({ _id: order._id });
+
+    return { ...order, status };
   }
 }
 

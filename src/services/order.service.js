@@ -44,6 +44,14 @@ class OrderService {
   async GetOrdersStatus({ _id }) {
     return await this.helpers.GetOrdersStatus({ _id });
   }
+
+  async GetUserOrder({ user }) {
+    return await this.helpers.GetUserOrder({ user });
+  }
+
+  async GetUserOrderDetails({ _id }) {
+    return await this.helpers.GetUserOrderDetails({ _id });
+  }
 }
 
 export default OrderService;

@@ -9,6 +9,20 @@ const PayBy = (app) => {
   // @access  Private
   app.post(
     "/create-payby",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const formData = req.body;
+
+      const data = await service.CreateOrder({ formData });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.post(
+    "/create-payByOrder",
+    Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const formData = req.body;
