@@ -5,8 +5,8 @@ class OrderService {
     this.helpers = new OrderHelper();
   }
 
-  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total }) {
-    return await this.helpers.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total });
+  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById }) {
+    return await this.helpers.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById });
   }
 
   async GetOrdersCount() {
@@ -51,6 +51,10 @@ class OrderService {
 
   async GetUserOrderDetails({ _id }) {
     return await this.helpers.GetUserOrderDetails({ _id });
+  }
+
+  async AssignOrder({ driverId, orderId }) {
+    return await this.helpers.AssignOrder({ driverId, orderId });
   }
 }
 

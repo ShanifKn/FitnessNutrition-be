@@ -169,6 +169,54 @@ class MailService {
 
     console.log("Order Confirmation Mail sent: %s", info.messageId);
   }
+
+  async sendLoginCredentialsSms(phoneNumber, email, password) {
+    // Configure the SMS gateway API
+    const smsGatewayUrl = SMS_GATEWAY_URL; // SMS gateway URL
+    const smsApiKey = SMS_API_KEY; // Your API key
+    const senderId = SENDER_ID; // Sender ID (e.g., your brand or app name)
+
+    // Define the SMS message
+    const smsMessage = `Your login credentials:\nEmail: ${email}\nPassword: ${password}\nPlease keep them safe.`;
+
+    // Prepare the payload for the API request
+    const payload = {
+      api_key: smsApiKey, // Correct API key field
+      type: "text", // Set the message type to "text"
+      contacts: `+971${phoneNumber}`, // Recipient phone number
+      senderid: senderId, // Sender ID
+      msg: smsMessage, // Message content
+    };
+
+    // Send SMS
+    try {
+      const response = await fetch(smsGatewayUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      // Check if the response is JSON or plain text
+      const contentType = response.headers.get("content-type");
+      let result;
+      if (contentType && contentType.includes("application/json")) {
+        result = await response.json(); // Parse as JSON
+      } else {
+        result = await response.text(); // Parse as plain text
+      }
+
+      if (response.ok) {
+        console.log("SMS sent successfully:", result);
+        return result;
+      } else {
+        throw new AppError("ERROR_SENDING_SMS", `Failed to send SMS: ${result}`, 400);
+      }
+    } catch (error) {
+      throw new AppError("ERROR_SENDING_SMS", "Error sending SMS", 400);
+    }
+  }
 }
 
 export default MailService;

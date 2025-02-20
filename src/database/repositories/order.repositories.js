@@ -3,7 +3,7 @@ import { Orders } from "../models/order.model.js";
 import { OrderStatus } from "../models/orderStatus.model.js";
 
 class OrderRepository {
-  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total }) {
+  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById }) {
     const newOrder = new Orders({
       user,
       billingInfo,
@@ -15,6 +15,7 @@ class OrderRepository {
       discountAmount,
       orderComfirmed,
       total,
+      payById,
     });
 
     // Save the order to the database
@@ -70,6 +71,7 @@ class OrderRepository {
       })
       .populate({
         path: "product.productId", // Populate productId within the product array
+        select: "_id images name rate",
       });
   }
 
@@ -99,11 +101,31 @@ class OrderRepository {
   }
 
   async GetUserOrderStatus({ _id }) {
-    return await OrderStatus.findOne({ orderId: _id }).lean().select('orderTimeline -_id');
+    return await OrderStatus.findOne({ orderId: _id }).lean().select("orderTimeline -_id");
   }
 
   async GetUserOrderDetails({ _id }) {
     return await Orders.findOne({ _id }).lean();
+  }
+
+  async UpdateOrderTimeline({ orderId, status, element, driverId }) {
+    const updateFields = {
+      [`orderTimeline.${element}.status`]: status,
+      [`orderTimeline.${element}.date`]: new Date(),
+      [`orderTimeline.${element}.time`]: new Date().toLocaleTimeString(),
+      [`orderTimeline.${element}.completed`]: true,
+    };
+  
+    // Only add driverId if it's provided
+    if (driverId) {
+      updateFields.driverId = driverId;
+    }
+  
+    return await OrderStatus.findOneAndUpdate(
+      { orderId: orderId },
+      { $set: updateFields },
+      { new: true } // Returns the updated document
+    );
   }
 }
 

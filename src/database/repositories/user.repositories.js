@@ -117,8 +117,15 @@ class UserRepository {
   }
 
   async GetUserDetails({ userId }) {
+
     return await Customer.findOne({ _id: userId }).select(" -password -createdAt -updatedAt -__v");
   }
+
+  async GetUserData({ user }) {
+    return await Customer.findOne({ _id: user }).select(" -password -createdAt -updatedAt -__v");
+  }
+
+
 
   async DeleteAddress({ userId, _id }) {
     return await Customer.updateOne(

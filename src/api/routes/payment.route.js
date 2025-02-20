@@ -16,9 +16,9 @@ const OrdersRouter = (app) => {
     tryCatch(async (req, res) => {
       const user = req.user._id;
 
-      const { billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total } = req.body;
+      const { billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById } = req.body;
 
-      const { message, pending } = await service.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total });
+      const { message, pending } = await service.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById });
 
       return res.status(200).json({ message, pending });
     })
@@ -121,6 +121,19 @@ const OrdersRouter = (app) => {
       const _id = req.params;
 
       const data = await service.GetUserOrderDetails({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.post(
+    "/order/assign",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { driverId, orderId } = req.body;
+
+      const data = await service.AssignOrder({ driverId, orderId });
 
       return res.status(200).json({ data });
     })

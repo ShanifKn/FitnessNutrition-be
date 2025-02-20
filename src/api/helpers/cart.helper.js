@@ -89,6 +89,26 @@ class CartHelper {
 
     return cart.totalQuantity;
   }
+
+  async CancelProduct({ productId, order }) {
+
+    // Find the product by ID and update its status
+    order.product.forEach((product) => {
+      if (product.productId === productId) {
+        product.status = "cancelled";
+      }
+    });
+
+    // If there are no products left, update the order status
+    if (order.product.length === 0) {
+      order.orderComfirmed = "cancelled";
+    }
+
+
+    if(order.orderComfirmed === "cancelled") {
+      
+    }
+  }
 }
 
 export default CartHelper;

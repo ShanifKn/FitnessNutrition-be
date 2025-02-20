@@ -168,7 +168,7 @@ class ProductRepository {
   }
 
   async GetProductForAdmin() {
-    return await Product.find({ pending: false }).populate("category", "name").limit(15);
+    return await Product.find({ pending: false }).populate("category", "name");
   }
 
   async GetPendingCounts() {

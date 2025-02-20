@@ -56,9 +56,11 @@ class PaybyHelper {
 
     const datas = await response.json();
 
-    if (datas.head.applyStatus === "SUCCESS") {
+    console.log(datas)
 
-      const data = datas.body.interActionParams;
+
+    if (datas.head.applyStatus === "SUCCESS") {
+      const data = { tokenUrl: datas.body.interActionParams.tokenUrl, payby: datas.body.acquireOrder.orderNo };
 
       return data;
     }

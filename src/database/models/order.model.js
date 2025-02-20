@@ -46,6 +46,8 @@ const orderSchema = new mongoose.Schema(
     invoiceId: { type: String },
 
     remark: { type: String },
+
+    payById: { type: String, default: null },
   },
   { timestamps: true }
 );

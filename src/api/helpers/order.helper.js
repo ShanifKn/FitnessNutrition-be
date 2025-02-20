@@ -1,4 +1,6 @@
 import OrderRepository from "../../database/repositories/order.repositories.js";
+import ProductRepository from "../../database/repositories/product.repositories.js";
+import UserRepository from "../../database/repositories/user.repositories.js";
 import MailService from "../../services/mail.service.js";
 import ZohoService from "../../services/zoho.service.js";
 
@@ -7,9 +9,11 @@ class OrderHelper {
     this.repository = new OrderRepository();
     this.zohoService = new ZohoService();
     this.mail = new MailService();
+    this.user = new UserRepository();
+    this.product = new ProductRepository();
   }
 
-  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total }) {
+  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById }) {
     let message = "";
 
     let pending = false;
@@ -21,7 +25,7 @@ class OrderHelper {
 
     //   pending = true;
     // } else {
-    const { _id } = await this.repository.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total });
+    const { _id } = await this.repository.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById });
 
     const order = await this.repository.findOrderWithDetails({ _id });
 
@@ -75,6 +79,92 @@ class OrderHelper {
 
     if (created) this.mail.sendOrderPlacedMail(user.email, orderDetails);
   }
+
+  // async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById }) {
+  //   let message = "";
+  //   let pending = false;
+
+  //   const { customerId } = await this.user.GetUserData({ user });
+
+  //   // First, create Zoho Sales Order
+  //   const zohoOrderDetails = await this.CreateZohoSalesOrder({ customerId, product, shippingAddress, total });
+
+  //   if (!zohoOrderDetails || !zohoOrderDetails.created) {
+  //     return { message: "Failed to create Zoho Sales Order. Order not placed.", pending: true };
+  //   }
+
+  //   // Create Order in the database after Zoho order is successful
+  //   const { _id } = await this.repository.createOrder({
+  //     user,
+  //     billingInfo,
+  //     product,
+  //     paymentMethod,
+  //     payment,
+  //     shippingAddress,
+  //     discountCoupon,
+  //     discountAmount,
+  //     orderComfirmed,
+  //     total,
+  //     payById,
+  //   });
+
+  //   const order = await this.repository.findOrderWithDetails({ _id });
+
+  //   message = "Order Placed successfully";
+
+  //   return { message, pending };
+  // }
+
+  // async CreateZohoSalesOrder({ customerId, product, shippingAddress, total }) {
+  //   const customerPayload = {
+  //     customer_id: customerId,
+  //     shipping_charge: 10,
+  //   };
+
+  //   const lineItems = await Promise.all(
+  //     product.map(async (product, index) => {
+  //       const _id = product.productId;
+  //       const prod = await this.product.GetProductDetails({ _id });
+
+  //       return {
+  //         item_order: index,
+  //         item_id: prod.item_id,
+  //         name: prod.name || prod.item_name,
+  //         rate: product.price,
+  //         description: prod.description,
+  //         quantity: product.quantity, // Default to 1 or fetch dynamically
+  //         product_type: prod.product_type || "goods",
+  //         unit: prod.unit || "Nos",
+  //         tax_id: prod.tax_id || null,
+  //         discount: prod.maxDiscount, // Default to no discount
+  //       };
+  //     })
+  //   );
+
+  //   const zohoPayload = {
+  //     ...customerPayload,
+  //     date: new Date().toISOString().split("T")[0], // Current date
+  //     line_items: lineItems,
+  //     notes: "Order created via integration",
+  //   };
+
+  //   const { created, salesOrder } = await this.zohoService.CreateSalesOrder({ zohoPayload });
+
+  //   if (created) {
+  //     await this.repository.UpdateSalesOrderId(user._id, salesOrder.salesorder_id);
+  //     await this.repository.deletCartByUser(user._id);
+
+  //     const orderDetails = {
+  //       orderNumber: salesOrder.salesorder_number,
+  //       orderDate: new Date().toISOString().split("T")[0],
+  //       totalAmount: total,
+  //     };
+
+  //     this.mail.sendOrderPlacedMail(user.email, orderDetails);
+  //   }
+
+  //   return { created, salesOrder };
+  // }
 
   async GetOrdersCount() {
     // Example usage
@@ -195,6 +285,12 @@ class OrderHelper {
     const status = await this.repository.GetUserOrderStatus({ _id: order._id });
 
     return { ...order, status };
+  }
+
+  async AssignOrder({ driverId, orderId }) {
+    await this.repository.UpdateOrderTimeline({ orderId, status: "Pick-up", element: 1, driverId });
+
+    return { message: "Order Assigned" };
   }
 }
 

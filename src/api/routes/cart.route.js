@@ -135,6 +135,19 @@ const CartRouter = (app) => {
       return res.status(200).json({ message });
     })
   );
+
+  app.post(
+    "/cancel-product",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { productId, order } = req.body;
+
+      const data = await service.CancelProduct({ productId, order });
+
+      return res.status(200).json({ data });
+    })
+  );
 };
 
 export default CartRouter;

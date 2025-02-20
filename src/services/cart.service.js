@@ -50,6 +50,10 @@ class CartService {
   async GetCartCount({ _id }) {
     return await this.helper.GetCartCount({ _id });
   }
+
+  async CancelProduct({ productId, order }) {
+    return await this.helper.CancelProduct({ productId, order });
+  }
 }
 
 export default CartService;

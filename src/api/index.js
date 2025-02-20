@@ -8,5 +8,6 @@ import CartRouter from "./routes/cart.route.js";
 import CustomerRoute from "./routes/customer.route.js";
 import OrdersRouter from "./routes/payment.route.js";
 import PayBy from "./routes/payby.route.js";
+import DriverRouter from "./routes/driver.route.js";
 
-export { CustomerRoute, PayBy, UserRouter, CartRouter, ErrorHandler, BannerRouter, CategoryRouter, ZohoRouter, ProductRouter, OrdersRouter };
+export { CustomerRoute, DriverRouter, PayBy, UserRouter, CartRouter, ErrorHandler, BannerRouter, CategoryRouter, ZohoRouter, ProductRouter, OrdersRouter };
