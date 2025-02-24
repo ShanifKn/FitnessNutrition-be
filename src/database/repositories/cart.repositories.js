@@ -31,7 +31,7 @@ class CartRepository {
   async GetCarts({ _id }) {
     return await Cart.findOne({ user: _id }).select(" -user  -__v").populate({
       path: "items.product", // Specify the field to populate
-      select: "_id name rate value rating stock_on_hand images quantity total ", // Fields to include in the populated data
+      select: "_id name rate value rating stock_on_hand images quantity total maxDiscount ", // Fields to include in the populated data
     });
   }
 
@@ -62,14 +62,14 @@ class CartRepository {
   async Getwishlist({ _id }) {
     return await Wishlist.findOne({ user: _id }).select(" -user  -__v").populate({
       path: "items.productId", // Specify the field to populate
-      select: "_id name rate value rating stock_on_hand images", // Fields to include in the populated data
+      select: "_id name rate value rating stock_on_hand images maxDiscount", // Fields to include in the populated data
     });
   }
 
   async GetWishlist({ _id }) {
     return await Wishlist.findOne({ user: _id }).select(" -user  -__v").populate({
       path: "items.productId", // Specify the field to populate
-      select: "_id name rate value rating stock_on_hand images", // Fields to include in the populated data
+      select: "_id name rate value rating stock_on_hand images maxDiscount", // Fields to include in the populated data
     });
   }
 

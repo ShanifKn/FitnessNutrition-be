@@ -11,8 +11,8 @@ class ProductService {
     return await this.helper.GetPendingProducts();
   }
 
-  async GetProducts() {
-    return await this.helper.GetProducts();
+  async GetProducts( page, limit) {
+    return await this.helper.GetProducts( page, limit);
   }
 
   async GetPendingCounts() {

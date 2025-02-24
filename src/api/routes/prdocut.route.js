@@ -29,7 +29,9 @@ const ProductRouter = (app) => {
     "/get-products",
     Validate,
     tryCatch(async (req, res) => {
-      const data = await service.GetProducts();
+      const { page, limit } = req.query;
+
+      const data = await service.GetProducts({ page, limit });
 
       return res.status(200).json({ data });
     })
@@ -373,7 +375,6 @@ const ProductRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
-
 };
 
 export default ProductRouter;

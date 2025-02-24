@@ -167,8 +167,12 @@ class ProductRepository {
       .limit(15);
   }
 
-  async GetProductForAdmin() {
-    return await Product.find({ pending: false }).populate("category", "name");
+  async GetProductForAdmin({ skip, limitInt }) {
+    return await Product.find({ pending: false }).skip(skip).limit(limitInt).populate("category", "name");
+  }
+
+  async GetProductForAdminCount() {
+    return await Product.countDocuments({ pending: false });
   }
 
   async GetPendingCounts() {
@@ -252,7 +256,7 @@ class ProductRepository {
   }
 
   async ProductDetails(productId) {
-    return await Product.findOne({ _id: productId }).select(" rate rating images ");
+    return await Product.findOne({ _id: productId }).select(" rate rating images maxDiscount");
   }
 
   async GetBrandName() {
@@ -292,7 +296,6 @@ class ProductRepository {
   async ProductSearch(filter) {
     return await Product.find(filter).limit(5);
   }
-
 }
 
 export default ProductRepository;

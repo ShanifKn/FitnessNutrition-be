@@ -3,7 +3,7 @@ import { Orders } from "../models/order.model.js";
 import { OrderStatus } from "../models/orderStatus.model.js";
 
 class OrderRepository {
-  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById }) {
+  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById, itemsTotal, deliveryCharge, vat }) {
     const newOrder = new Orders({
       user,
       billingInfo,
@@ -16,6 +16,9 @@ class OrderRepository {
       orderComfirmed,
       total,
       payById,
+      itemsTotal,
+      deliveryCharge,
+      vat,
     });
 
     // Save the order to the database
@@ -71,7 +74,7 @@ class OrderRepository {
       })
       .populate({
         path: "product.productId", // Populate productId within the product array
-        select: "_id images name rate",
+        select: "_id images name rate maxDiscount",
       });
   }
 
@@ -94,7 +97,7 @@ class OrderRepository {
     return await Orders.find({ user: user })
       .populate({
         path: "product.productId",
-        select: "_id name rate images rating",
+        select: "_id name rate images rating maxDiscount",
         // Populate productId within the product array
       })
       .lean();
@@ -115,12 +118,12 @@ class OrderRepository {
       [`orderTimeline.${element}.time`]: new Date().toLocaleTimeString(),
       [`orderTimeline.${element}.completed`]: true,
     };
-  
+
     // Only add driverId if it's provided
     if (driverId) {
       updateFields.driverId = driverId;
     }
-  
+
     return await OrderStatus.findOneAndUpdate(
       { orderId: orderId },
       { $set: updateFields },

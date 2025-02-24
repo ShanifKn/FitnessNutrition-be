@@ -13,7 +13,7 @@ class CategoryRepository {
   }
 
   async GetAllTheCategory() {
-    return await MainCategory.find({ visibility: true });
+    return await MainCategory.find({ visibility: true, disable: false });
   }
 
   async GetAllTheCategoryFilter() {
@@ -29,9 +29,11 @@ class CategoryRepository {
       {
         $match: {
           visibility: true,
+          disable: false,
           $or: [
             { featuredCategory: true }, // Top-level featured categories
-            { "subCategory.featuredCategory": true }, // Subcategories with featuredCategory true
+            { "subCategory.featuredCategory": true },
+            { "subCategory.visible": true }, // Subcategories with featuredCategory true
           ],
         },
       },
@@ -99,7 +101,7 @@ class CategoryRepository {
   }
 
   async DeleteCategory({ _id }) {
-    return await MainCategory.deleteOne({ _id: _id });
+    return await MainCategory.updateOne({ _id: _id }, { $set: { disable: true, featuredCategory: false } });
   }
 
   async UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image }) {
@@ -135,7 +137,12 @@ class CategoryRepository {
             $filter: {
               input: "$subCategory",
               as: "sub",
-              cond: { $eq: ["$$sub.featuredCategory", true] },
+              cond: {
+                $and: [
+                  { $eq: ["$$sub.featuredCategory", true] },
+                  { $eq: ["$$sub.visible", true] }
+                ],
+              },
             },
           },
         },

@@ -11,8 +11,28 @@ class ProductHelper {
     return await this.repository.GetPendingProducts();
   }
 
-  async GetProducts() {
-    return await this.repository.GetProductForAdmin();
+  async GetProducts({ page, limit }) {
+    const skip = (page - 1) * limit; // Calculate how many records to skip
+
+    // Convert page and limit to integers
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+
+    console.log(page, limit);
+
+    const totalProducts = await this.repository.GetProductForAdminCount();
+
+    const product = await this.repository.GetProductForAdmin({ skip, limitInt });
+
+    const totalPages = Math.ceil(totalProducts / limitInt);
+
+    const data = {
+      totalProducts,
+      product,
+      totalPages,
+    };
+
+    return data;
   }
 
   async GetPendingCounts() {
@@ -528,9 +548,6 @@ class ProductHelper {
 
     return await this.repository.ProductSearch(filter);
   }
-
-
-
 }
 
 export default ProductHelper;

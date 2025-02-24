@@ -56,7 +56,7 @@ class PaybyHelper {
 
     const datas = await response.json();
 
-    console.log(datas)
+
 
 
     if (datas.head.applyStatus === "SUCCESS") {

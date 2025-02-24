@@ -28,7 +28,7 @@ class ZohoService {
     const organizationID = ZOHO_ORGANIZATION;
 
     const data = await this.helper.GetZohoApi(productUrl, access_token, organizationID);
-    // console.log(data);
+
 
     if (data) return await this.helper.SaveProduct(data);
 

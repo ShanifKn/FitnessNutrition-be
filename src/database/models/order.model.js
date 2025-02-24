@@ -39,6 +39,12 @@ const orderSchema = new mongoose.Schema(
 
     total: { type: Number, required: true },
 
+    itemsTotal: { type: Number, required: true },
+
+    deliveryCharge: { type: Number, required: true },
+
+    vat: { type: Number, required: true },
+
     salesorderId: { type: String },
 
     orderNumber: { type: String, unique: true },

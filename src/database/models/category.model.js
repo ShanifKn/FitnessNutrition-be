@@ -21,6 +21,8 @@ const categoryLevel1 = new mongoose.Schema({
 
   updatedAt: { type: Date, default: Date.now },
 
+  disable: { type: Boolean, default: false },
+
   subCategory: [
     {
       title: { type: String, default: null }, // Allows null values
@@ -30,6 +32,7 @@ const categoryLevel1 = new mongoose.Schema({
       featuredCategory: { type: Boolean, default: false },
       image: { type: String },
       description: { type: String },
+      visible: { type: Boolean, default: false },
       tag: { type: String },
 
       subCategory: [
@@ -37,6 +40,7 @@ const categoryLevel1 = new mongoose.Schema({
           title: { type: String, default: null }, // Allows null values
           createdAt: { type: Date, default: Date.now },
           updatedAt: { type: Date, default: Date.now },
+          visible: { type: Boolean, default: false },
           level: { type: Number, default: 2 },
         },
       ],

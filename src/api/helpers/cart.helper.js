@@ -12,14 +12,16 @@ class CartHelper {
 
     const product = await this.productRepository.ProductDetails(productId);
 
-    const price = product.rate;
+    console.log(product);
+
+    const price = product.rate - (product.rate * product.maxDiscount) / 100;
     const total = price * quantity; // Calculate total for this product
 
     // Add to the cart items array
     cartItems.push({
       product: productId,
       quantity: quantity,
-      price: product.rate,
+      price: product.rate - (product.rate * product.maxDiscount) / 100,
       total,
       rating: product.rating,
       images: product.images[0],
@@ -91,7 +93,6 @@ class CartHelper {
   }
 
   async CancelProduct({ productId, order }) {
-
     // Find the product by ID and update its status
     order.product.forEach((product) => {
       if (product.productId === productId) {
@@ -104,9 +105,7 @@ class CartHelper {
       order.orderComfirmed = "cancelled";
     }
 
-
-    if(order.orderComfirmed === "cancelled") {
-      
+    if (order.orderComfirmed === "cancelled") {
     }
   }
 }

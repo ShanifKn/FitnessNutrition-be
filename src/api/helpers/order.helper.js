@@ -13,133 +13,50 @@ class OrderHelper {
     this.product = new ProductRepository();
   }
 
-  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById }) {
-    let message = "";
-
-    let pending = false;
-
-    // const order = await this.repository.findOrderWithDetails({ user });
-
-    // if (order && order.orderComfirmed === "pending") {
-    //   message = "Previous order is on pending. Once it is confirmed, you can place another order.";
-
-    //   pending = true;
-    // } else {
-    const { _id } = await this.repository.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById });
-
-    const order = await this.repository.findOrderWithDetails({ _id });
-
-    message = "Order Placed successfully";
-
-    await this.CreateZohoSalesOrder(order);
-    // }
-
-    return { message, pending };
-  }
-
-  async CreateZohoSalesOrder(userDetails) {
-    const { user, product, shippingAddress, _id, orderNumber, total } = userDetails;
-
-    const customerPayload = {
-      customer_id: user.customerId,
-    };
-
-    // Map product fields to line_items
-    const lineItems = product.map((product, index) => ({
-      item_order: index,
-      item_id: product.productId.item_id,
-      name: product.productId.name || product.productId.item_name,
-      rate: product.productId.rate,
-      description: product.productId.description,
-      quantity: product.quantity, // Default to 1 or fetch dynamically
-      product_type: product.productId.product_type || "goods",
-      unit: product.productId.unit || "Nos",
-      tax_id: product.productId.tax_id || null,
-      discount: "0", // Default to no discount
-    }));
-
-    const zohoPayload = {
-      ...customerPayload,
-      date: new Date().toISOString().split("T")[0], // Current date
-      line_items: lineItems,
-      notes: "Order created via integration",
-    };
-
-    const { created, salesOrder } = await this.zohoService.CreateSalesOrder({ zohoPayload });
-
-    if (created) await this.repository.UpdateSalesOrderId(_id, salesOrder.salesorder_id);
-
-    if (created) await this.repository.deletCartByUser(user._id);
-
-    const orderDetails = {
-      orderNumber,
-      orderDate: new Date().toISOString().split("T")[0],
-      totalAmount: total,
-    };
-
-    if (created) this.mail.sendOrderPlacedMail(user.email, orderDetails);
-  }
-
-  // async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById }) {
+  // async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById, itemsTotal, deliveryCharge, vat }) {
   //   let message = "";
+
   //   let pending = false;
 
-  //   const { customerId } = await this.user.GetUserData({ user });
+  //   // const order = await this.repository.findOrderWithDetails({ user });
 
-  //   // First, create Zoho Sales Order
-  //   const zohoOrderDetails = await this.CreateZohoSalesOrder({ customerId, product, shippingAddress, total });
+  //   // if (order && order.orderComfirmed === "pending") {
+  //   //   message = "Previous order is on pending. Once it is confirmed, you can place another order.";
 
-  //   if (!zohoOrderDetails || !zohoOrderDetails.created) {
-  //     return { message: "Failed to create Zoho Sales Order. Order not placed.", pending: true };
-  //   }
-
-  //   // Create Order in the database after Zoho order is successful
-  //   const { _id } = await this.repository.createOrder({
-  //     user,
-  //     billingInfo,
-  //     product,
-  //     paymentMethod,
-  //     payment,
-  //     shippingAddress,
-  //     discountCoupon,
-  //     discountAmount,
-  //     orderComfirmed,
-  //     total,
-  //     payById,
-  //   });
+  //   //   pending = true;
+  //   // } else {
+  //   const { _id } = await this.repository.createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById, itemsTotal, deliveryCharge, vat });
 
   //   const order = await this.repository.findOrderWithDetails({ _id });
 
   //   message = "Order Placed successfully";
 
+  //   await this.CreateZohoSalesOrder(order);
+  //   // }
+
   //   return { message, pending };
   // }
 
-  // async CreateZohoSalesOrder({ customerId, product, shippingAddress, total }) {
+  // async CreateZohoSalesOrder(userDetails) {
+  //   const { user, product, shippingAddress, _id, orderNumber, total } = userDetails;
+
   //   const customerPayload = {
-  //     customer_id: customerId,
-  //     shipping_charge: 10,
+  //     customer_id: user.customerId,
   //   };
 
-  //   const lineItems = await Promise.all(
-  //     product.map(async (product, index) => {
-  //       const _id = product.productId;
-  //       const prod = await this.product.GetProductDetails({ _id });
-
-  //       return {
-  //         item_order: index,
-  //         item_id: prod.item_id,
-  //         name: prod.name || prod.item_name,
-  //         rate: product.price,
-  //         description: prod.description,
-  //         quantity: product.quantity, // Default to 1 or fetch dynamically
-  //         product_type: prod.product_type || "goods",
-  //         unit: prod.unit || "Nos",
-  //         tax_id: prod.tax_id || null,
-  //         discount: prod.maxDiscount, // Default to no discount
-  //       };
-  //     })
-  //   );
+  //   // Map product fields to line_items
+  //   const lineItems = product.map((product, index) => ({
+  //     item_order: index,
+  //     item_id: product.productId.item_id,
+  //     name: product.productId.name || product.productId.item_name,
+  //     rate: product.productId.rate,
+  //     description: product.productId.description,
+  //     quantity: product.quantity, // Default to 1 or fetch dynamically
+  //     product_type: product.productId.product_type || "goods",
+  //     unit: product.productId.unit || "Nos",
+  //     tax_id: product.productId.tax_id || null,
+  //     discount: "0", // Default to no discount
+  //   }));
 
   //   const zohoPayload = {
   //     ...customerPayload,
@@ -150,21 +67,106 @@ class OrderHelper {
 
   //   const { created, salesOrder } = await this.zohoService.CreateSalesOrder({ zohoPayload });
 
-  //   if (created) {
-  //     await this.repository.UpdateSalesOrderId(user._id, salesOrder.salesorder_id);
-  //     await this.repository.deletCartByUser(user._id);
+  //   if (created) await this.repository.UpdateSalesOrderId(_id, salesOrder.salesorder_id);
 
-  //     const orderDetails = {
-  //       orderNumber: salesOrder.salesorder_number,
-  //       orderDate: new Date().toISOString().split("T")[0],
-  //       totalAmount: total,
-  //     };
+  //   if (created) await this.repository.deletCartByUser(user._id);
 
-  //     this.mail.sendOrderPlacedMail(user.email, orderDetails);
-  //   }
+  //   const orderDetails = {
+  //     orderNumber,
+  //     orderDate: new Date().toISOString().split("T")[0],
+  //     totalAmount: total,
+  //   };
 
-  //   return { created, salesOrder };
+  //   if (created) this.mail.sendOrderPlacedMail(user.email, orderDetails);
   // }
+
+  async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById, itemsTotal, deliveryCharge, vat }) {
+    let message = "";
+    let pending = false;
+
+    const users = await this.user.GetUserData({ user });
+
+    // First, create Zoho Sales Order
+    const zohoOrderDetails = await this.CreateZohoSalesOrder({ users, product, shippingAddress, total });
+
+    if (!zohoOrderDetails || !zohoOrderDetails.created) {
+      return { message: "Failed to create Zoho Sales Order. Order not placed.", pending: true };
+    }
+
+    // Create Order in the database after Zoho order is successful
+    const { _id } = await this.repository.createOrder({
+      user,
+      billingInfo,
+      product,
+      paymentMethod,
+      payment,
+      shippingAddress,
+      discountCoupon,
+      discountAmount,
+      orderComfirmed,
+      total,
+      payById,
+      itemsTotal,
+      deliveryCharge,
+      vat,
+    });
+
+    const order = await this.repository.findOrderWithDetails({ _id });
+
+    message = "Order Placed successfully";
+
+    return { message, pending };
+  }
+
+  async CreateZohoSalesOrder({ users, product, shippingAddress, total }) {
+    const customerPayload = {
+      customer_id: users.customerId,
+    };
+
+    const lineItems = await Promise.all(
+      product.map(async (product, index) => {
+        const _id = product.productId;
+        const prod = await this.product.GetProductDetails({ _id });
+
+        return {
+          item_order: index,
+          item_id: prod.item_id,
+          name: prod.name || prod.item_name,
+          rate: product.price,
+          description: prod.description,
+          quantity: product.quantity, // Default to 1 or fetch dynamically
+          product_type: prod.product_type || "goods",
+          unit: prod.unit || "Nos",
+          tax_id: prod.tax_id || null,
+          discount: prod.maxDiscount, // Default to no discount
+        };
+      })
+    );
+
+    const zohoPayload = {
+      ...customerPayload,
+      date: new Date().toISOString().split("T")[0], // Current date
+      line_items: lineItems,
+      notes: "Order created via integration",
+    };
+
+    const { created, salesOrder } = await this.zohoService.CreateSalesOrder({ zohoPayload });
+
+    if (created) {
+      await this.repository.UpdateSalesOrderId(users._id, salesOrder.salesorder_id);
+      await this.repository.deletCartByUser(users._id);
+
+      const orderDetails = {
+        orderNumber: salesOrder.salesorder_number,
+        orderDate: new Date().toISOString().split("T")[0],
+        totalAmount: total,
+      };
+
+      this.mail.sendOrderPlacedMail(users.email, orderDetails);
+    }
+
+    return { created, salesOrder };
+  }
 
   async GetOrdersCount() {
     // Example usage
