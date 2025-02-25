@@ -12,8 +12,6 @@ class CartHelper {
 
     const product = await this.productRepository.ProductDetails(productId);
 
-    console.log(product);
-
     const price = product.rate - (product.rate * product.maxDiscount) / 100;
     const total = price * quantity; // Calculate total for this product
 
