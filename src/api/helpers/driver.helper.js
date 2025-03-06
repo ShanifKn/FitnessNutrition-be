@@ -17,13 +17,13 @@ class DriverHelper {
 
     const password = await this.userHelper.CreateHash(generatePassword);
 
-    const create = await this.repository.createDriver({ password, image, name, email, phone, whatappPhone, branch, location, dlNo });
+    const create = await this.repository.createOrUpdateDriver({ password, image, name, email, phone, whatappPhone, branch, location, dlNo });
 
     setTimeout(() => {
       this.sendLoginCredentialsSms({ phone, email, generatePassword });
-    }, 5000);
+    }, 2000);
 
-    return { message: "New Driver created succefull" };
+    return create;
   }
 
   async sendLoginCredentialsSms({ phone, email, generatePassword }) {
@@ -78,7 +78,7 @@ class DriverHelper {
     return { message: "Reset password sent via SMS successfully." };
   }
 
-  async getDriverOrderCount({ driverId }){
+  async getDriverOrderCount({ driverId }) {
     return await this.helper.getDriverOrderCount({ driverId })
   }
 }

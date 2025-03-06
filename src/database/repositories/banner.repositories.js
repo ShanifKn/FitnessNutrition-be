@@ -1,7 +1,7 @@
 import { BannerModel } from "../models/banner.model.js";
 
 class BannerRepository {
-  constructor() {}
+  constructor() { }
 
   async GetAllBanners() {
     return await BannerModel.find();

@@ -375,6 +375,74 @@ const ProductRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+
+
+  // @route GET /
+  // @des get product details
+  // @access private
+  app.post(
+    "/products/relatedproducts",
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const { productId, categoryId } = req.body;
+
+      const data = await service.RelatedProduct({ productId, categoryId });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
+
+
+
+  // @route POST /
+  // @des get create combo product
+  // @access private
+  app.post(
+    "/products/create-combo",
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const { _id, products, title, description, rating, price, discount, image } = req.body;
+
+      const data = await service.CreateComboProduct({ _id, products, title, description, rating, price, discount, image });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
+
+  app.get(
+    "/products/combos",
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const data = await service.GetComboProducts();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
+  app.get(
+    "/products/combos/_id",
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const { _id } = req.params
+
+      const data = await service.GetComboProduct({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
+
 };
 
 export default ProductRouter;

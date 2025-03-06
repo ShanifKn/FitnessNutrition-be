@@ -20,6 +20,7 @@ const orderSchema = new mongoose.Schema(
         image: { type: String },
         name: { type: String },
         status: { type: String, default: "pending", enum: ["pending", "cancelled", "return", "delivered", "confirmed"] },
+        review:{type:Boolean, default:false}
       },
     ],
 
@@ -35,7 +36,7 @@ const orderSchema = new mongoose.Schema(
 
     discountAmount: { type: Number },
 
-    orderComfirmed: { type: String, default: "pending", enum: ["pending", "cancelled", "return", "delivered", "confirmed"] },
+    orderComfirmed: { type: String, default: "pending", enum: ["pending", "cancelled", "return", "delivered", "confirmed", "picked"] },
 
     total: { type: Number, required: true },
 
@@ -54,6 +55,8 @@ const orderSchema = new mongoose.Schema(
     remark: { type: String },
 
     payById: { type: String, default: null },
+
+    payByRefundId: { type: String, default: null },
   },
   { timestamps: true }
 );

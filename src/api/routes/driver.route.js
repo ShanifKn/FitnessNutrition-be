@@ -15,7 +15,6 @@ const DriverRouter = (app) => {
     tryCatch(async (req, res) => {
       const { image, name, email, phone, whatappPhone, branch, location, dlNo } = req.body;
 
-      await check.ForSignup({ email });
 
       const data = await service.createDriver({ image, name, email, phone, whatappPhone, branch, location, dlNo });
 
@@ -84,7 +83,7 @@ const DriverRouter = (app) => {
 
 
 
-  
+
   app.post(
     "/driver/login",
     Validate,

@@ -2,9 +2,11 @@ import mongoose, { Schema } from "mongoose";
 
 const deliverySchema = new mongoose.Schema({
 
-  orderId: { type: Schema.Types.ObjectId, ref: "Order" },
+  userId: { type: Schema.Types.ObjectId, ref: "user" },
 
-  status: { type: String, default: "pending", enum: ["pending", "cancelled", "return", "delivered"] },
+  deliveryCharge: { type: Number },
 
-  
 });
+
+
+export const DeliveryCharge = mongoose.model("DLCharge", deliverySchema);

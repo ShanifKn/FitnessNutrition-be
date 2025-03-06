@@ -11,8 +11,8 @@ class ProductService {
     return await this.helper.GetPendingProducts();
   }
 
-  async GetProducts( page, limit) {
-    return await this.helper.GetProducts( page, limit);
+  async GetProducts(page, limit) {
+    return await this.helper.GetProducts(page, limit);
   }
 
   async GetPendingCounts() {
@@ -217,6 +217,24 @@ class ProductService {
 
   async ProductSearch({ query }) {
     return await this.helper.ProductSearch({ query });
+  }
+
+
+  async RelatedProduct({ productId, categoryId }) {
+    return await this.helper.RelatedProduct({ productId, categoryId })
+  }
+
+
+  async CreateComboProduct({ _id, products, title, description, rating, price, discount, image }) {
+    return await this.helper.CreateComboProduct({ _id, products, title, description, rating, price, discount, image });
+  }
+
+  async GetComboProducts() {
+    return await this.helper.GetComboProducts()
+  }
+
+  async GetComboProduct({ _id }) {
+    return await this.helper.GetComboProduct({ _id })
   }
 
 }

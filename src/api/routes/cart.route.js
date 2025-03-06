@@ -136,14 +136,14 @@ const CartRouter = (app) => {
     })
   );
 
-  app.post(
-    "/cancel-product",
+  app.delete(
+    "/cancel-product/:_id",
     Authentication,
     Validate,
     tryCatch(async (req, res) => {
-      const { productId, order } = req.body;
+      const orderId = req.params._id;
 
-      const data = await service.CancelProduct({ productId, order });
+      const data = await service.CancelProduct({ orderId });
 
       return res.status(200).json({ data });
     })

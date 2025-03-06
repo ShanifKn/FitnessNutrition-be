@@ -51,8 +51,8 @@ class CartService {
     return await this.helper.GetCartCount({ _id });
   }
 
-  async CancelProduct({ productId, order }) {
-    return await this.helper.CancelProduct({ productId, order });
+  async CancelProduct({ orderId }) {
+    return await this.helper.CancelProduct({ orderId });
   }
 }
 

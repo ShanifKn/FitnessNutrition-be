@@ -1,4 +1,4 @@
-import { MERCHANT_ID, PAYBY_API_KEY, PAYBY_API_URL } from "../../config/index.js";
+import { MERCHANT_ID, PAYBY_API_KEY, PAYBY_API_URL, PAYBY_REFUND_URL } from "../../config/index.js";
 import fs from "fs";
 import crypto from "crypto";
 import path from "path";
@@ -16,7 +16,7 @@ class PaybyHelper {
         subject: formData.product[0]?.name,
         totalAmount: {
           currency: "AED",
-          amount: formData.total || 0,
+          amount: String(Number(formData.total).toFixed(2)),
         },
         paySceneCode: "PAYPAGE",
       },
@@ -56,13 +56,59 @@ class PaybyHelper {
 
     const datas = await response.json();
 
-
-
-
     if (datas.head.applyStatus === "SUCCESS") {
       const data = { tokenUrl: datas.body.interActionParams.tokenUrl, payby: datas.body.acquireOrder.orderNo };
 
       return data;
+    }
+  }
+
+  async RefundOrder({ order }) {
+    const refundMerchantOrderNo = `REFUND_${order.id}_${Date.now()}`; // Generate a unique refund ID
+
+    const requestBody = {
+      requestTime: Date.now(),
+      bizContent: {
+        refundMerchantOrderNo: refundMerchantOrderNo, // Use the generated refund ID
+        originOrderNo: order.payById, // PayBy's original transaction ID
+        amount: {
+          currency: "AED",
+          amount: String(Number(order.total).toFixed(2)),
+        },
+        reason: order.refundReason || "No reason provided", // Optional: Reason for refund
+        // Optional: Your endpoint to receive refund notifications
+      },
+    };
+
+    const filePath = "./Merchant_private_key.pem";
+    const privateKey = fs.readFileSync(filePath, "utf8");
+
+    const requestBodyString = JSON.stringify(requestBody);
+    const sign = crypto.createSign("SHA256");
+    sign.update(requestBodyString);
+    sign.end();
+    const signature = sign.sign(privateKey, "base64");
+
+    const response = await fetch(PAYBY_REFUND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Language": "en",
+        "Content-Type": "application/json",
+        sign: signature,
+        "Partner-Id": MERCHANT_ID,
+      },
+      body: requestBodyString,
+    });
+
+    const responseData = await response.json();
+
+    // Handle the response based on PayBy's API documentation
+    if (responseData.head.msg === "SUCCESS") {
+
+      return refundMerchantOrderNo;
+    } else {
+      // console.error(`Refund failed: ${responseData.msg} (Code: ${responseData.code})`);
+      throw new AppError(ZOHO_API_ERROR, "Please try again later", 400);
     }
   }
 }

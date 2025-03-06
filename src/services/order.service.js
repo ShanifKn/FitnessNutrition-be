@@ -56,6 +56,25 @@ class OrderService {
   async AssignOrder({ driverId, orderId }) {
     return await this.helpers.AssignOrder({ driverId, orderId });
   }
+
+
+  async CreateReview({ userId, orderId, productId, rating, review }) {
+    return await this.helpers.CreateReview({ userId, orderId, productId, rating, review })
+  }
+
+
+  async GetProductReviews({ _id }) {
+    return await this.helpers.GetProductReviews({ _id })
+  }
+
+
+  async GetDeliveryCharge() {
+    return await this.helpers.GetDeliveryCharge()
+  }
+
+  async AddDeliveryCharge({ userId, deliveryCharge }) {
+    return await this.helpers.AddDeliveryCharge({ userId, deliveryCharge })
+  }
 }
 
 export default OrderService;

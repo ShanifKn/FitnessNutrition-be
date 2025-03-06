@@ -1,10 +1,16 @@
 import CartRepository from "../../database/repositories/cart.repositories.js";
+import OrderRepository from "../../database/repositories/order.repositories.js";
 import ProductRepository from "../../database/repositories/product.repositories.js";
+import AppError from "../../utils/appError.js";
+import { ZOHO_API_ERROR } from "../constants/errorCodes.js";
+import PaybyHelper from "./payby.helper.js";
 
 class CartHelper {
   constructor() {
     this.productRepository = new ProductRepository();
+    this.orderRepository = new OrderRepository();
     this.repository = new CartRepository();
+    this.payby = new PaybyHelper();
   }
 
   async FetchProducts({ productId, quantity }) {
@@ -90,21 +96,25 @@ class CartHelper {
     return cart.totalQuantity;
   }
 
-  async CancelProduct({ productId, order }) {
-    // Find the product by ID and update its status
-    order.product.forEach((product) => {
-      if (product.productId === productId) {
-        product.status = "cancelled";
-      }
-    });
+  async CancelProduct({ orderId }) {
+    let refundOrderNo = "";
 
-    // If there are no products left, update the order status
-    if (order.product.length === 0) {
-      order.orderComfirmed = "cancelled";
+    const order = await this.orderRepository.findOrderWithDetails({ _id: orderId });
+
+    if (order.orderComfirmed === "picked") {
+      throw new AppError(ZOHO_API_ERROR, "Your Order has been Dispatched", 400);
     }
 
-    if (order.orderComfirmed === "cancelled") {
+    if (order.paymentMethod === "PAYBY" && order.payment === true) {
+      refundOrderNo = await this.payby.RefundOrder({ order });
     }
+
+
+    await this.orderRepository.UpdateOrderTimeline({ orderId, status: "Pick-up", element: 1 });
+
+    await this.orderRepository.UpdateOrderTimeline({ orderId, status: "Cancelled", element: 2 });
+
+    return await this.orderRepository.CancelOrder({ _id: orderId, refundOrderNo });
   }
 }
 

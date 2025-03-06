@@ -18,7 +18,7 @@ const driverSchema = new mongoose.Schema(
 
     location: { type: String },
 
-    dlNo: { type: String, unique: true, required: true },
+    dlNo: { type: String, unique: true },
 
     active: { type: Boolean, default: true },
 

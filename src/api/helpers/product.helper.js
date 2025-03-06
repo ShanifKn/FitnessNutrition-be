@@ -1,5 +1,8 @@
 import CategoryRepository from "../../database/repositories/category.repositories.js";
 import ProductRepository from "../../database/repositories/product.repositories.js";
+import { ObjectId } from "mongodb";
+
+
 
 class ProductHelper {
   constructor() {
@@ -320,15 +323,15 @@ class ProductHelper {
   }
 
   async GetAllProduct() {
-    return this.repository.GetAllProduct();
+    return await this.repository.GetAllProduct();
   }
 
   async CreateVaraintProduct({ item_id, products }) {
-    return this.repository.CreateVaraintProduct({ item_id, products });
+    return await this.repository.CreateVaraintProduct({ item_id, products });
   }
 
   async getVariant(_id) {
-    return this.repository.getVariant(_id);
+    return await this.repository.getVariant(_id);
   }
 
   async getProductWithLimit({ pageInt, limitInt, skip, categoryId }) {
@@ -337,8 +340,8 @@ class ProductHelper {
     // Define the filter conditionally
     const filter = categoryId
       ? {
-          $or: [{ category: categoryId }, { subCategory: categoryId }, { parentCategory: categoryId }],
-        }
+        $or: [{ category: categoryId }, { subCategory: categoryId }, { parentCategory: categoryId }],
+      }
       : {}; // If no categoryId is provided, return all products
 
     // Fetch the total number of products based on the filter
@@ -530,6 +533,52 @@ class ProductHelper {
     }
 
     return await this.repository.ProductSearch(filter);
+  }
+
+
+  async RelatedProduct({ productId, categoryId }) {
+    let data = []
+    let products = [];
+
+    data = await this.repository.getVariants({ _id: productId })
+
+    if (!data) {
+      data = await this.repository.RelatedProduct({ categoryId })
+      products = data;
+    } else {
+      data.products.map(product => {
+
+
+        // Push the merged object to products array
+        products.push({
+          ...product.product_id, // Spread existing product_id properties
+          variantType: product.variantType, // Add variantType
+          variants: product.variants // Add variants
+        });
+      });
+
+    }
+    return products;
+  }
+
+
+  async CreateComboProduct({ _id, products, title, description, rating, price, discount, image }) {
+
+    if (!_id) {
+      _id = new ObjectId();
+    }
+    return await this.repository.CreateComboProduct({ _id, products, title, description, rating, price, discount, image });
+  }
+
+
+
+  async GetComboProducts() {
+    return await this.repository.GetComboProducts()
+  }
+
+
+  async GetComboProduct({ _id }) {
+    return await this.repository.GetComboProduct({ _id })
   }
 }
 

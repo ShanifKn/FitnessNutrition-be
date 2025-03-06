@@ -1,3 +1,4 @@
+import { ComboModel } from "../models/combo.model.js";
 import { Product } from "../models/product.model.js";
 import { ProductVariant } from "../models/variantProduct.model.js";
 
@@ -295,6 +296,41 @@ class ProductRepository {
 
   async ProductSearch(filter) {
     return await Product.find(filter).limit(5);
+  }
+
+  async getVariants({ _id }) {
+    return await ProductVariant.findOne({ item_id: _id })
+      .populate({
+        path: "products.product_id",
+        select: "_id item_id actual_available_stock name rate status images maxDiscount rating" // Select specific fields from populated product_id
+      }).lean()
+      .exec();
+  }
+
+
+
+  async RelatedProduct({ categoryId }) {
+    return await Product.find({ parentCategory: categoryId, pending: false }).select("_id item_id actual_available_stock name rate status images maxDiscount rating").limit(5).lean();
+  }
+
+
+  async CreateComboProduct({ _id, products, title, description, rating, price, discount, image }) {
+    return await ComboModel.updateOne({ _id }, { products, title, description, rating, price, discount, image }, { upsert: true, new: true })
+  }
+
+
+  async GetComboProducts() {
+    return await ComboModel.find()
+      .populate({
+        path: 'products.productId', 
+        select: 'name price image', 
+      })
+      .lean();
+  }
+  
+  
+  async GetComboProduct({ _id }) {
+    return await ComboModel.findOne({ _id }).lean()
   }
 }
 

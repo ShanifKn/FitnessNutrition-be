@@ -138,6 +138,66 @@ const OrdersRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+  app.post(
+    "/order/create-review",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const userId = req.user._id;
+
+
+      const { orderId, productId, rating, review } = req.body;
+
+      const { message } = await service.CreateReview({ userId, orderId, productId, rating, review });
+
+      return res.status(200).json({ message });
+    })
+  );
+
+
+  app.get(
+    "/product/review/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const _id = req.params;
+
+      const data = await service.GetProductReviews({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.get(
+    "/deliveryCharge",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const data = await service.GetDeliveryCharge();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
+  app.post(
+    "/deliveryCharge",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const userId = req.user._id;
+
+      const { deliveryCharge } = req.body
+
+      const data = await service.AddDeliveryCharge({ userId, deliveryCharge });
+
+      return res.status(200).json({ data });
+    })
+  );
 };
 
 export default OrdersRouter;

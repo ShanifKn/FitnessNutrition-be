@@ -1,6 +1,9 @@
 import { Cart } from "../models/cart.model.js";
+import { DeliveryCharge } from "../models/delivery.model.js";
 import { Orders } from "../models/order.model.js";
 import { OrderStatus } from "../models/orderStatus.model.js";
+import { Product } from "../models/product.model.js";
+import { Review } from "../models/review.model.js";
 
 class OrderRepository {
   async createOrder({ user, billingInfo, product, paymentMethod, payment, shippingAddress, discountCoupon, discountAmount, orderComfirmed, total, payById, itemsTotal, deliveryCharge, vat }) {
@@ -111,7 +114,7 @@ class OrderRepository {
     return await Orders.findOne({ _id }).lean();
   }
 
-  async UpdateOrderTimeline({ orderId, status, element, driverId }) {
+  async UpdateOrderTimeline({ orderId, status, element, driverId = "" }) {
     const updateFields = {
       [`orderTimeline.${element}.status`]: status,
       [`orderTimeline.${element}.date`]: new Date(),
@@ -130,6 +133,71 @@ class OrderRepository {
       { new: true } // Returns the updated document
     );
   }
+
+  async CancelOrder({ _id, refundOrderNo }) {
+    const newdat = await Orders.updateOne(
+      { _id },
+      {
+        $set: {
+          orderComfirmed: "cancelled",
+          reFund: true,
+          payByRefundId: refundOrderNo,
+          "product.$[].status": "cancelled", // Updates all products in the array
+        },
+      },
+      { new: true }
+    );
+
+  }
+
+  async UpdateOrderProductReview({ orderId, productId }) {
+    return await Orders.findOneAndUpdate(
+      { _id: orderId, "product.productId": productId }, // Find order with matching productId
+      { $set: { "product.$.review": true } }, // Update the review field to true
+      { new: true } // Return updated document
+    );
+  }
+
+  async CreateReview({ userId, orderId, productId, rating, review }) {
+
+    const neworder = new Review({
+      userId, orderId, productId, rating, review
+    })
+
+    return await neworder.save()
+
+  }
+
+
+  async GetProductReviews({ _id }) {
+    return await Review.find({ productId: _id }).select(" -__v -updatedAt").populate({
+      path: "userId",
+      select: "name image -_id",
+    }).lean();
+  }
+
+
+  async UpdateProductStock({ _id, quanity }) {
+    return await Product.findOneAndUpdate(
+      { _id: _id },
+      { $inc: { stock_on_hand: -Number(quanity) } }, // Reduce stock
+      { new: true } // Returns the updated document
+    )
+  }
+
+
+  async GetDeliveryCharge() {
+    return await DeliveryCharge.findOne();
+  }
+
+  async AddDeliveryCharge({ userId, deliveryCharge }) {
+    return await DeliveryCharge.findOneAndUpdate(
+      { userId },  // Find by userId
+      { $set: { deliveryCharge } },  // Update the deliveryCharge
+      { new: true, upsert: true }  // Return updated doc, create if not exists
+    );
+  }
+
 }
 
 export default OrderRepository;

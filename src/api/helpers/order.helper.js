@@ -162,7 +162,11 @@ class OrderHelper {
         totalAmount: total,
       };
 
-      this.mail.sendOrderPlacedMail(users.email, orderDetails);
+      setTimeout(async () => {
+        this.mail.sendOrderPlacedMail(users.email, orderDetails);
+      }, 2000)
+
+
     }
 
     return { created, salesOrder };
@@ -215,10 +219,15 @@ class OrderHelper {
     if (orderComfirmed === "confirmed") {
       orderTimeline = await this.OrderTracking({ _id });
 
-      await this.sendConfirmationEmail({ _id });
+      setTimeout(async () => {
+        await this.UpdateProductStock({ product });
+        await this.sendConfirmationEmail({ _id });
+      }, 1000); // Delay of 3 seconds (3000 milliseconds)
     }
 
+
     if (orderComfirmed === "delivered") {
+      await this.repository.UpdateOrderTimeline({ orderId: _id, status: "Delivered", element: 3 })
     }
 
     const datas = {
@@ -228,6 +237,16 @@ class OrderHelper {
 
     return datas;
   }
+
+
+  async UpdateProductStock({ product }) {
+    for (const item of product) {
+      if (item.status === 'confirmed') {
+        return await this.repository.UpdateProductStock({ _id: item._id, quanity: item.quantity })
+      }
+    }
+  }
+
 
   async sendConfirmationEmail({ _id }) {
     const data = await this.repository.GetOrdersDetails({ _id });
@@ -293,6 +312,28 @@ class OrderHelper {
     await this.repository.UpdateOrderTimeline({ orderId, status: "Pick-up", element: 1, driverId });
 
     return { message: "Order Assigned" };
+  }
+
+
+  async CreateReview({ userId, orderId, productId, rating, review }) {
+    await this.repository.UpdateOrderProductReview({ orderId, productId })
+
+    await this.repository.CreateReview({ userId, orderId, productId, rating, review })
+
+
+    return { message: "Product review added!" };
+  }
+
+  async GetProductReviews({ _id }) {
+    return await this.repository.GetProductReviews({ _id })
+  }
+
+  async GetDeliveryCharge() {
+    return await this.repository.GetDeliveryCharge()
+  }
+
+  async AddDeliveryCharge({ userId, deliveryCharge }) {
+    return await this.repository.AddDeliveryCharge({ userId, deliveryCharge })
   }
 }
 

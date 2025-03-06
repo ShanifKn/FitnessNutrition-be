@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema(
 
     orderTimeline: [
       {
-        status: { type: String, enum: ["Order Confirmed", "Pick-up", "Dispatched", "Expected Delivery", "Pending", "Cancelled"], required: true },
+        status: { type: String, enum: ["Order Confirmed", "Pick-up", "Dispatched", "Delivered", "Pending", "Cancelled"], required: true },
         date: { type: Date },
         time: { type: String },
         completed: { type: Boolean, default: false },
