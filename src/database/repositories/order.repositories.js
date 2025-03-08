@@ -46,7 +46,7 @@ class OrderRepository {
     return await Cart.deleteOne({ user: _id });
   }
 
-  async GetOrdersCount({ status }) {
+  async GetOrdersCount(status) {
     return await Orders.countDocuments({
       orderComfirmed: status,
     });
@@ -115,6 +115,7 @@ class OrderRepository {
   }
 
   async UpdateOrderTimeline({ orderId, status, element, driverId = "" }) {
+
     const updateFields = {
       [`orderTimeline.${element}.status`]: status,
       [`orderTimeline.${element}.date`]: new Date(),

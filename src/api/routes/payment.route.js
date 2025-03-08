@@ -113,6 +113,20 @@ const OrdersRouter = (app) => {
     })
   );
 
+
+  app.get(
+    "/admin/userOrders/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const user = req.params;
+
+      const data = await service.GetUserOrder({ user });
+
+      return res.status(200).json({ data });
+    })
+  );
+
   app.get(
     "/userOrders/:_id",
     Authentication,
@@ -138,6 +152,23 @@ const OrdersRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+
+  app.post(
+    "/order/driver/accept",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { orderId, accept } = req.body;
+
+      const driverId = req.user._id;
+
+      const data = await service.AcceptOrder({ orderId, accept, driverId });
+
+      return res.status(200).json({ data });
+    })
+  );
+
 
   app.post(
     "/order/create-review",

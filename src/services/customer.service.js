@@ -12,6 +12,10 @@ class CustomerService {
   async GetCustomerDetails({ _id }) {
     return await this.helper.GetCustomerDetails({ _id });
   }
+
+  async GetCustomerCount({ userId }) {
+    return await this.helper.GetCustomerCount({ userId })
+  }
 }
 
 export default CustomerService;

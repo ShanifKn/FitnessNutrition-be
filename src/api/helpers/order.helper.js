@@ -176,7 +176,7 @@ class OrderHelper {
     // Example usage
     const pendingOrders = await this.repository.GetOrdersCount("pending");
     const cancelledOrders = await this.repository.GetOrdersCount("cancelled");
-    const deliveredOrders = await this.repository.GetOrdersCount("delivered");
+    const deliveredOrders = await this.repository.GetOrdersCount( "delivered");
     const totalOrders = await this.repository.GetOrdersCounts();
 
     const data = {
@@ -334,6 +334,22 @@ class OrderHelper {
 
   async AddDeliveryCharge({ userId, deliveryCharge }) {
     return await this.repository.AddDeliveryCharge({ userId, deliveryCharge })
+  }
+
+
+  async AcceptOrder({ orderId, accept, driverId }) {
+
+
+
+    if (accept) {
+      await this.repository.UpdateOrderTimeline({ orderId, status: "Dispatched", element: 2, driverId });
+
+      return { message: "Order Dispatched" };
+    } else {
+      await this.repository.UpdateOrderTimeline({ orderId, status: "Pending", element: 1, driverId });
+
+      return { message: "Order Return to pickup" };
+    }
   }
 }
 

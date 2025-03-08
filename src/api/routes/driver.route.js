@@ -68,20 +68,17 @@ const DriverRouter = (app) => {
   );
 
   app.get(
-    "/driver/order/count",
+    "/driver/order/count/:_id",
     Authentication,
     Validate,
     tryCatch(async (req, res) => {
-      const driverId = req.body;
+      const driverId = req.params._id;
 
       const data = await service.getDriverOrderCount({ driverId });
 
       return res.status(200).json({ data });
     })
   );
-
-
-
 
 
   app.post(

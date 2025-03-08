@@ -79,7 +79,7 @@ class DriverHelper {
   }
 
   async getDriverOrderCount({ driverId }) {
-    return await this.helper.getDriverOrderCount({ driverId })
+    return await this.repository.getDriverOrderCount({ driverId })
   }
 }
 

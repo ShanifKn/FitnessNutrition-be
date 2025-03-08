@@ -75,6 +75,11 @@ class OrderService {
   async AddDeliveryCharge({ userId, deliveryCharge }) {
     return await this.helpers.AddDeliveryCharge({ userId, deliveryCharge })
   }
+
+
+  async AcceptOrder({ orderId, accept, driverId }) {
+    return await this.helpers.AcceptOrder({ orderId, accept, driverId })
+  }
 }
 
 export default OrderService;

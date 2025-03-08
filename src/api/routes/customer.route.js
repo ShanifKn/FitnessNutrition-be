@@ -32,6 +32,21 @@ const CustomerRoute = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+
+  app.get(
+    "/customers-detail/count/:_id",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const userId = req.params._id;
+
+      const data = await service.GetCustomerCount({ userId });
+
+      return res.status(200).json({ data });
+    })
+  );
 };
 
 export default CustomerRoute;
