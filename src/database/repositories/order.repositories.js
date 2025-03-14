@@ -3,6 +3,7 @@ import { DeliveryCharge } from "../models/delivery.model.js";
 import { Orders } from "../models/order.model.js";
 import { OrderStatus } from "../models/orderStatus.model.js";
 import { Product } from "../models/product.model.js";
+import { Return } from "../models/return.model.js";
 import { Review } from "../models/review.model.js";
 
 class OrderRepository {
@@ -57,7 +58,7 @@ class OrderRepository {
   }
 
   async GetOrders({ pageInt, limitInt, skip }) {
-    return await Orders.find().skip(skip).limit(limitInt).exec();
+    return await Orders.find().sort({ createdAt: -1 }).skip(skip).limit(limitInt).exec();
   }
 
   async GetReturnOrders({ pageInt, limitInt, skip }) {
@@ -70,6 +71,7 @@ class OrderRepository {
   }
 
   async GetOrdersDetails({ _id }) {
+
     return await Orders.findOne({ _id })
       .populate({
         path: "user",
@@ -88,6 +90,7 @@ class OrderRepository {
   async UpdateOrder({ _id, orderComfirmed, invoiceId, product, remark }) {
     return await Orders.findByIdAndUpdate({ _id }, { $set: { orderComfirmed, invoiceId, product, remark } }, { new: true, runValidators: true });
   }
+
   async AddOrderTimeline(data) {
     return await OrderStatus.create(data);
   }
@@ -102,7 +105,7 @@ class OrderRepository {
         path: "product.productId",
         select: "_id name rate images rating maxDiscount",
         // Populate productId within the product array
-      })
+      }).sort({ createdAt: -1 })
       .lean();
   }
 
@@ -197,6 +200,50 @@ class OrderRepository {
       { $set: { deliveryCharge } },  // Update the deliveryCharge
       { new: true, upsert: true }  // Return updated doc, create if not exists
     );
+  }
+
+  async ReturnRequest({ orderId, productId, email, messages, quantity, request, userId, price }) {
+    const newReturn = new Return({ orderId, productId, email, messages, quantity, request, userId, price })
+
+    return await newReturn.save()
+  }
+
+  async GetReturnRequests() {
+    return await Return.find({ request: "Return" })
+      .populate('userId', 'name email phone image ')  // Fetching user details
+      .populate('productId')  // Fetching product details
+      .populate('orderId').sort({ createdAt: -1 });  // Fetching order details
+  }
+
+  async FindRequestById({ _id }) {
+    return await Return.findOne({ _id }).populate('userId', 'name email phone image ')  // Fetching user details
+      .populate('productId')  // Fetching product details
+      .populate('orderId');  // Fetching order details
+  }
+
+  async AcceptReturn({ requestId, reason }) {
+    return await Return.updateOne({ _id: requestId }, { $set: { status: "Accepted", reason: reason } })
+  }
+
+  async RejectReturn({ requestId, reason }) {
+    return await Return.updateOne({ _id: requestId }, { $set: { status: "Declined", response: reason } })
+  }
+
+  async AcceptReturn({ requestId, reason }) {
+    return await Return.updateOne({ _id: requestId }, { $set: { status: "Accepted", response: reason } })
+  }
+
+
+  async GetSupportRequests() {
+    return await Return.find({ request: "Support" })
+      .populate('userId', 'name email phone image ')  // Fetching user details
+      .populate('productId')  // Fetching product details
+      .populate('orderId').sort({ createdAt: -1 });  // Fetching order details
+
+  }
+
+  async SupportResponse({ requestId, reason }) {
+    return await Return.updateOne({ _id: requestId }, { $set: { status: "Accepted", response: reason } })
   }
 
 }

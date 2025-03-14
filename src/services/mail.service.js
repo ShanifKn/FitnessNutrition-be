@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 class MailService {
-  constructor() {}
+  constructor() { }
 
   async sendOtpMail(email, otp) {
     const otpString = otp.toString();
@@ -64,7 +64,7 @@ class MailService {
     const payload = {
       api_key: smsApiKey, // Correct API key field
       type: "text", // Set the message type to "text"
-      contacts: `+971${phoneNumber}`, // Recipient phone number
+      contacts: phoneNumber, // Recipient phone number
       senderid: senderId, // Sender ID
       msg: smsMessage, // Message content
     };
@@ -183,7 +183,7 @@ class MailService {
     const payload = {
       api_key: smsApiKey, // Correct API key field
       type: "text", // Set the message type to "text"
-      contacts: `+971${phoneNumber}`, // Recipient phone number
+      contacts: phoneNumber, // Recipient phone number
       senderid: senderId, // Sender ID
       msg: smsMessage, // Message content
     };
@@ -217,6 +217,125 @@ class MailService {
       throw new AppError("ERROR_SENDING_SMS", "Error sending SMS", 400);
     }
   }
+
+  async sendReturnRejectMail({ email, name, quantity, price, reason }) {
+
+    // Email content for rejected return request
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <h2 style="color: #d9534f;">Return Request Rejected</h2>
+        <p>Dear Customer,</p>
+        <p>We regret to inform you that your return request has been rejected for the following reason:</p>
+        <div style="background: #f8d7da; padding: 10px; border-radius: 5px; margin: 10px 0;">
+          <strong>Reason:</strong> ${reason}
+        </div>
+        <p>Product Details:</p>
+        <div style="background: #f3f3f3; padding: 10px; border-radius: 5px; margin: 10px 0;">
+          <strong>Product Name:</strong> ${name || "N/A"} <br>
+          <strong>Quantity:</strong> ${quantity || "N/A"} <br>
+          <strong>Price:</strong> AED ${price || "N/A"}
+        </div>
+        <p>If you have any concerns, please contact our support team.</p>
+        <p>Thank you,<br>Team Fit & Muscles</p>
+        <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;">
+        <footer style="font-size: 12px; color: #888;">
+          <p>This is an automated email, please do not reply.</p>
+          <p>&copy; 2024 Fit & Muscles. All rights reserved.</p>
+        </footer>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `${EMAIL_USER_ID}`,
+      to: email,
+      subject: "Return Request Rejected",
+      text: `Your return request for ${name || "N/A"} has been rejected. Reason: ${reason}`,
+      html: htmlContent,
+    });
+
+    console.log("Message sent: %s");
+
+  }
+
+  async sendReturnAcceptMail({ email, name, quantity, price }) {
+    // Email content for accepted return request
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <h2 style="color: #28a745;">Return Request Accepted</h2>
+        <p>Dear Customer,</p>
+        <p>We are pleased to inform you that your return request has been <strong>approved</strong>.</p>
+        
+        <p><strong>Product Details:</strong></p>
+        <div style="background: #f3f3f3; padding: 10px; border-radius: 5px; margin: 10px 0;">
+          <strong>Product Name:</strong> ${name || "N/A"} <br>
+          <strong>Quantity:</strong> ${quantity || "N/A"} <br>
+          <strong>Refund Amount:</strong> AED ${price || "N/A"}
+        </div>
+  
+        <p>Our team will process the return as per our return policy. If you have any further queries, feel free to contact our support team.</p>
+        <p>Thank you,<br>Team Fit & Muscles</p>
+        
+        <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;">
+        <footer style="font-size: 12px; color: #888;">
+          <p>This is an automated email, please do not reply.</p>
+          <p>&copy; 2024 Fit & Muscles. All rights reserved.</p>
+        </footer>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `${EMAIL_USER_ID}`,
+      to: email,
+      subject: "Return Request Approved",
+      text: `Your return request for ${name || "N/A"} has been approved. Refund Amount: AED ${price || "N/A"}.`,
+      html: htmlContent,
+    });
+
+    console.log("Return approval email sent successfully.");
+  }
+
+  async sendSupportResponseMail({ email, ticketId, message, reason }) {
+    // Define the HTML structure of the email
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <h2 style="color: #007bff;">Support Request Update</h2>
+        <p>Dear User,</p>
+        <p>We have reviewed your support request (Ticket ID: <strong>#${ticketId}</strong>).</p>
+        
+        <p><strong>Your Query:</strong></p>
+        <blockquote style="background: #f9f9f9; padding: 10px; border-left: 4px solid #007bff;">
+          ${message}
+        </blockquote>
+  
+        <p><strong>Our Response:</strong></p>
+        <blockquote style="background: #e8f4fc; padding: 10px; border-left: 4px solid #28a745;">
+          ${reason}
+        </blockquote>
+  
+        <p>If you need further assistance, feel free to reply to this email.</p>
+        <p>Thank you for reaching out to us.</p>
+        
+        <p>Best Regards,<br>Support Team</p>
+        <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;">
+        <footer style="font-size: 12px; color: #888;">
+          <p>This is an automated email, please do not reply.</p>
+          <p>&copy; 2024 Your Company. All rights reserved.</p>
+        </footer>
+      </div>
+    `;
+
+    // Send the email
+    const info = await transporter.sendMail({
+      from: `${EMAIL_USER_ID}`, // Sender address
+      to: email, // Recipient address
+      subject: `Support Request Update - OrderId #${ticketId}`, // Subject line
+      text: `Dear User, we have reviewed your support request (Ticket ID: #${ticketId}).\n\nYour Query:\n${message}\n\nOur Response:\n${reason}\n\nBest Regards,\nSupport Team`, // Plain text fallback
+      html: htmlContent, // HTML body
+    });
+
+    console.log("Support response email sent: %s", info.messageId);
+  }
+
 }
 
 export default MailService;

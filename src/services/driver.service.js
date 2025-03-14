@@ -36,8 +36,13 @@ class DriverService {
   }
 
 
-  async getDriverOrderCount({ driverId }){
+  async getDriverOrderCount({ driverId }) {
     return await this.helper.getDriverOrderCount({ driverId })
+  }
+
+
+  async getDriverPendingOrders({ _id }) {
+    return await this.helper.getDriverPendingOrders({ _id })
   }
 }
 

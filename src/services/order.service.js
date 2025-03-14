@@ -80,6 +80,29 @@ class OrderService {
   async AcceptOrder({ orderId, accept, driverId }) {
     return await this.helpers.AcceptOrder({ orderId, accept, driverId })
   }
+
+
+  async ReturnRequest({ orderId, productId, email, messages, quantity, request, userId }) {
+    return await this.helpers.ReturnRequest({ orderId, productId, email, messages, quantity, request, userId })
+  }
+
+  async GetReturnRequests() {
+    return await this.helpers.GetReturnRequests()
+  }
+
+  async RequestResponse({ requestId, reason, response }) {
+    return await this.helpers.RequestResponse({ requestId, reason, response })
+  }
+
+
+  async GetSupportRequests() {
+    return await this.helpers.GetSupportRequests()
+  }
+
+
+  async SupportResponse({ requestId, reason }) {
+    return await this.helpers.SupportResponse({ requestId, reason })
+  }
 }
 
 export default OrderService;

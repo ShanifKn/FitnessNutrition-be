@@ -190,7 +190,6 @@ const OrdersRouter = (app) => {
 
   app.get(
     "/product/review/:_id",
-    Authentication,
     Validate,
     tryCatch(async (req, res) => {
       const _id = req.params;
@@ -229,6 +228,75 @@ const OrdersRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+  app.post(
+    "/order/returnRequest",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const userId = req.user._id;
+
+      const { orderId, productId, email, messages, quantity, request } = req.body
+
+      const { message } = await service.ReturnRequest({ orderId, productId, email, messages, quantity, request, userId });
+
+      return res.status(200).json({ message });
+    }))
+
+
+  // admin side
+  app.get(
+    "/order/requests/return",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const data = await service.GetReturnRequests();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.post(
+    "/order/return/request",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const { requestId, reason, response } = req.body
+
+      const { message } = await service.RequestResponse({ requestId, reason, response });
+
+      return res.status(200).json({ message });
+    }))
+
+
+  app.get(
+    "/order/requests/support",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const data = await service.GetSupportRequests();
+
+      return res.status(200).json({ data });
+    })
+  );
+
+  app.post(
+    "/order/response/support",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+
+      const { requestId, reason } = req.body
+
+      const { message } = await service.SupportResponse({ requestId, reason });
+
+      return res.status(200).json({ message });
+    }))
+
 };
 
 export default OrdersRouter;

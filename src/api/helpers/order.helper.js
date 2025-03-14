@@ -176,7 +176,7 @@ class OrderHelper {
     // Example usage
     const pendingOrders = await this.repository.GetOrdersCount("pending");
     const cancelledOrders = await this.repository.GetOrdersCount("cancelled");
-    const deliveredOrders = await this.repository.GetOrdersCount( "delivered");
+    const deliveredOrders = await this.repository.GetOrdersCount("delivered");
     const totalOrders = await this.repository.GetOrdersCounts();
 
     const data = {
@@ -311,6 +311,8 @@ class OrderHelper {
   async AssignOrder({ driverId, orderId }) {
     await this.repository.UpdateOrderTimeline({ orderId, status: "Pick-up", element: 1, driverId });
 
+    // await this.repository.
+
     return { message: "Order Assigned" };
   }
 
@@ -336,9 +338,7 @@ class OrderHelper {
     return await this.repository.AddDeliveryCharge({ userId, deliveryCharge })
   }
 
-
   async AcceptOrder({ orderId, accept, driverId }) {
-
 
 
     if (accept) {
@@ -350,6 +350,73 @@ class OrderHelper {
 
       return { message: "Order Return to pickup" };
     }
+  }
+
+  async ReturnRequest({ orderId, productId, email, messages, quantity, request, userId }) {
+
+    const order = await this.repository.GetOrdersDetails({ _id: orderId })
+
+    const product = order.product.find(p => p.productId._id.toString() === productId);
+
+    const vatAmount = product.price * 0.05;
+
+    const price = product.price + vatAmount
+
+    await this.repository.ReturnRequest({ orderId, productId, email, messages, quantity, request, userId, price })
+
+    return { message: `Request submitted for "${product.name}"` };
+
+  }
+
+  async GetReturnRequests() {
+    return await this.repository.GetReturnRequests()
+  }
+
+
+  async RequestResponse({ requestId, reason, response }) {
+
+    const details = await this.repository.FindRequestById({ _id: requestId })
+
+
+    if (response) {
+      await this.repository.AcceptReturn({ requestId, reason })
+
+      setTimeout(async () => {
+        await this.mail.sendReturnAcceptMail({ email: details.email, name: details.productId.name, quantity: details.quantity, price: details.price })
+      }, 2000)
+
+      await this.repository.AcceptReturn({ requestId, reason })
+
+      return { message: "Return request has been successfully accepted" }
+    } else {
+
+      await this.repository.RejectReturn({ requestId, reason })
+
+      setTimeout(async () => {
+        await this.mail.sendReturnRejectMail({ email: details.email, name: details.productId.name, quantity: details.quantity, price: details.price, reason })
+      }, 2000)
+
+      return { message: "Return request has been rejected" }
+    }
+  }
+
+
+  async GetSupportRequests() {
+    return await this.repository.GetSupportRequests()
+  }
+
+
+  async SupportResponse({ requestId, reason }) {
+
+    const details = await this.repository.FindRequestById({ _id: requestId })
+
+    setTimeout(async () => {
+      await this.mail.sendSupportResponseMail({ email: details.email, ticketId: details.orderId.orderNumber, message: details.messages, reason })
+    }, 2000)
+
+    await this.repository.SupportResponse({ requestId, reason })
+
+    return { message: "Support reply mail has been sent" }
   }
 }
 

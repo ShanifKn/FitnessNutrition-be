@@ -45,9 +45,16 @@ class CategoryHelper {
   }
 
   async UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image }) {
+
+    if (!_id) {
+      _id = new ObjectId();
+    }
+
     await this.categoryRepository.UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image });
 
-    return { message: "Category update successfully" };
+
+    return { message: "Sub category is added!" };
+
   }
 
   async GetCategoryDetailForTitle({ _id }) {

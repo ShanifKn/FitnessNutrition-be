@@ -156,6 +156,46 @@ class DriverRepository {
   }
 
 
+  async getDriverPendingOrders({ _id }) {
+    return await OrderStatus.aggregate([
+      { $match: { driverId: _id } }, // Match driverId
+      {
+        $addFields: {
+          pickUpIndex: {
+            $indexOfArray: ["$orderTimeline.status", "Pick-up"]
+          }
+        }
+      },
+      {
+        $match: {
+          pickUpIndex: { $ne: -1 }, // Ensure "Pick-up" status exists
+          $expr: {
+            $ne: [
+              { $arrayElemAt: ["$orderTimeline.status", { $add: ["$pickUpIndex", 1] }] },
+              "Delivered"
+            ]
+          }
+        }
+      },
+      {
+        $lookup: { // Populate orderId details
+          from: "orders",
+          localField: "orderId",
+          foreignField: "_id",
+          as: "orderDetails"
+        }
+      },
+      { $unwind: "$orderDetails" }, // Convert orderId array to object
+      {
+        $project: {
+          orderId: "$orderDetails",
+          driverId: 1,
+          orderTimeline: 1
+        }
+      }
+    ]);
+  }
+
 }
 
 export default DriverRepository;

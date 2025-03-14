@@ -108,6 +108,21 @@ const DriverRouter = (app) => {
       return res.status(200).json({ data });
     })
   );
+
+  app.get(
+    "/driver/pendingOrders",
+    Authentication,
+    Validate,
+    tryCatch(async (req, res) => {
+      const { _id } = req.user;
+
+      const data = await service.getDriverPendingOrders({ _id });
+
+      return res.status(200).json({ data });
+    })
+  );
+
+
 };
 
 export default DriverRouter;

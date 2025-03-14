@@ -81,6 +81,11 @@ class DriverHelper {
   async getDriverOrderCount({ driverId }) {
     return await this.repository.getDriverOrderCount({ driverId })
   }
+
+
+  async getDriverPendingOrders({ _id }) {
+    return await this.repository.getDriverPendingOrders({ _id })
+  }
 }
 
 export default DriverHelper;

@@ -5,16 +5,82 @@ import mongoose, { Schema } from "mongoose";
 
 class CategoryRepository {
   async CreateCategory({ image, _id, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory, subCategory }) {
-    return await MainCategory.findByIdAndUpdate({ _id }, { image, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory, subCategory }, { upsert: true, new: true });
+
+
+    // Remove undefined fields except subCategory
+    const filteredData = Object.fromEntries(
+      Object.entries({ image, title, tag, description, visibility, publishDate, maximumDiscount, featuredCategory })
+        .filter(([_, value]) => value !== undefined)
+    );
+
+    const updateQuery = { $set: filteredData };
+
+    // Ensure subCategory is updated without duplicating entries
+    if (subCategory && subCategory.length > 0) {
+      updateQuery.$set["subCategory"] = subCategory;
+    }
+
+    return await MainCategory.findByIdAndUpdate(
+      { _id },
+      updateQuery,
+      { upsert: true, new: true }
+    );
   }
+
+
 
   async CreateSubCategory({ _id, title, level, parent }) {
     return await SubCategory.findByIdAndUpdate({ _id }, { title, level, parent }, { upsert: true, new: true });
   }
 
   async GetAllTheCategory() {
-    return await MainCategory.find({ visibility: true, disable: false });
+    return await MainCategory.aggregate([
+      {
+        $addFields: {
+          subCategory: {
+            $filter: {
+              input: "$subCategory",
+              as: "sub",
+              cond: {
+                $and: [
+                  { $eq: ["$$sub.visible", true] },
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        $addFields: {
+          subCategory: {
+            $map: {
+              input: "$subCategory",
+              as: "sub",
+              in: {
+                $mergeObjects: [
+                  "$$sub",
+                  {
+                    subCategory: {
+                      $filter: {
+                        input: "$$sub.subCategory",
+                        as: "subSub",
+                        cond: {
+                          $and: [
+                            { $eq: ["$$subSub.visible", true] },
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]);
   }
+
 
   async GetAllTheCategoryFilter() {
     return await MainCategory.find({ visibility: true }).select(" title ");
@@ -105,19 +171,37 @@ class CategoryRepository {
   }
 
   async UpdateSubCategory({ parentId, _id, title, tag, description, featuredCategory, image }) {
-    return await MainCategory.findOneAndUpdate(
-      { _id: parentId, "subCategory._id": _id },
-      {
-        $set: {
-          "subCategory.$.title": title,
-          "subCategory.$.description": description,
-          "subCategory.$.tag": tag,
-          "subCategory.$.featuredCategory": featuredCategory,
-          "subCategory.$.image": image,
-        },
-      }
+
+    // Remove undefined fields
+    const filteredData = Object.fromEntries(
+        Object.entries({ title, tag, description, featuredCategory, image })
+        .filter(([_, value]) => value !== undefined)
     );
-  }
+
+    // First, check if subcategory exists
+    const category = await MainCategory.findOne({ _id: parentId, "subCategory._id": _id });
+
+    if (!category) {
+        // If subCategory does not exist, push a new one
+        return await MainCategory.findOneAndUpdate(
+            { _id: parentId },
+            { $push: { subCategory: { _id, ...filteredData } } }, // Add new subcategory
+            { upsert: true, new: true }
+        );
+    }
+
+    // If subCategory exists, update it
+    return await MainCategory.findOneAndUpdate(
+        { _id: parentId, "subCategory._id": _id },
+        {
+            $set: Object.fromEntries(
+                Object.entries(filteredData).map(([key, value]) => [`subCategory.$.${key}`, value])
+            )
+        },
+        { new: true }
+    );
+}
+
 
   async GetAllFeaturedCategoryAdmin() {
     const featuredCategories = await MainCategory.aggregate([
